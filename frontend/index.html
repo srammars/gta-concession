@@ -4,36 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GTA Concession</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Concession GTA</title>
 </head>
 <body>
-    <header>
-        <h1>Bienvenue à la Concession GTA</h1>
-    </header>
+    <h1>Gestion de la Concession GTA</h1>
 
-    <section id="vehicules">
-        <h2>Véhicules Disponibles</h2>
-        <div id="vehicule-list"></div>
-    </section>
+    <h2>Ajouter un véhicule</h2>
+    <form id="addVehicleForm">
+        <input type="text" id="marque" placeholder="Marque" required><br>
+        <input type="text" id="modele" placeholder="Modèle" required><br>
+        <input type="number" id="prix" placeholder="Prix" required><br>
+        <input type="file" id="image" accept="image/*"><br>
+        <input type="text" id="vendeur" placeholder="Vendeur" required><br>
+        <button type="submit">Ajouter</button>
+    </form>
 
-    <section id="ajouter-vehicule">
-        <h2>Ajouter un Véhicule</h2>
-        <form id="form-ajout-vehicule">
-            <label for="marque">Marque :</label>
-            <input type="text" id="marque" required>
-            <label for="modele">Modèle :</label>
-            <input type="text" id="modele" required>
-            <label for="type">Type :</label>
-            <input type="text" id="type" required>
-            <label for="prix">Prix :</label>
-            <input type="number" id="prix" required>
-            <label for="image">Image :</label>
-            <input type="file" id="image">
-            <button type="submit">Ajouter Véhicule</button>
-        </form>
-    </section>
+    <h2>Liste des véhicules</h2>
+    <ul id="vehicleList"></ul>
 
-    <script src="script.js"></script>
+    <script>
+        document.getElementById("addVehicleForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append("marque", document.getElementById("marque").value);
+            formData.append("modele", document.getElementById("modele").value);
+            formData.append("prix", document.getElementById("prix").value);
+            formData.append("vendeur", document.getElementById("vendeur").value);
+            formData.append("image", document.getElementById("image").files[0]);
+
+            fetch("/vehicules", {
+                method: "POST",
+                body: formData
+            }).then(response => response.json())
+              .then(data => console.log(data))
+              .catch(error => console.error(error));
+        });
+    </script>
 </body>
 </html>
