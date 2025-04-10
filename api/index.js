@@ -1,17 +1,25 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const app = express();
-const port = process.env.PORT || 3000;
+const cors = require('cors');
 
 dotenv.config();
 
-// Connexion à MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connecté à MongoDB !'))
-  .catch(err => console.log('Erreur de connexion MongoDB :', err));
+// Création de l'application Express
+const app = express();
+const port = process.env.PORT || 3000;
 
-// Schéma pour les véhicules
+// Middleware pour gérer les requêtes JSON et CORS
+app.use(bodyParser.json());
+app.use(cors());
+
+// Connexion à la base de données MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connecté à la base de données MongoDB'))
+  .catch((err) => console.log('Erreur de connexion à la base de données MongoDB:', err));
+
+// Schéma et modèle pour les véhicules
 const vehicleSchema = new mongoose.Schema({
   nomVehicule: String,
   plaque: String,
@@ -26,17 +34,32 @@ const vehicleSchema = new mongoose.Schema({
 
 const Vehicle = mongoose.model('Vehicle', vehicleSchema);
 
-// Middleware pour analyser le JSON
-app.use(express.json());
-app.use(express.static('public'));
+// Schéma et modèle pour les utilisateurs (vendeurs et acheteurs)
+const userSchema = new mongoose.Schema({
+  nom: String,
+  prenom: String,
+  role: String // "vendeur" ou "acheteur"
+});
 
-// Route pour récupérer les véhicules
+const User = mongoose.model('User', userSchema);
+
+// Route pour récupérer tous les véhicules
 app.get('/api/vehicles', async (req, res) => {
   try {
     const vehicles = await Vehicle.find();
-    res.json(vehicles);
+    res.json(vehicles); // Renvoie les véhicules sous format JSON
   } catch (err) {
     res.status(500).json({ error: 'Erreur lors de la récupération des véhicules' });
+  }
+});
+
+// Route pour récupérer tous les utilisateurs (vendeurs et acheteurs)
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users); // Renvoie les utilisateurs sous format JSON
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
   }
 });
 
@@ -66,13 +89,13 @@ app.post('/api/vehicles', async (req, res) => {
 
   try {
     const savedVehicle = await vehicle.save();
-    res.status(201).json(savedVehicle);
+    res.status(201).json(savedVehicle); // Renvoie le véhicule ajouté
   } catch (err) {
     res.status(500).json({ error: 'Erreur lors de l\'ajout du véhicule' });
   }
 });
 
-// Démarrer le serveur
+// Démarrer le serveur backend
 app.listen(port, () => {
   console.log(`Serveur backend démarré sur http://localhost:${port}`);
 });

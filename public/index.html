@@ -79,126 +79,99 @@
   </style>
 </head>
 <body>
+  <h1>Ajouter un véhicule</h1>
 
-  <h1>Gestion de véhicules</h1>
+  <form id="vehicleForm">
+    <input type="text" id="nomVehicule" placeholder="Nom du véhicule" required><br>
+    <input type="text" id="plaque" placeholder="Plaque d'immatriculation" required><br>
+    
+    <select id="vendeur">
+      <option value="" disabled selected>Choisir un vendeur</option>
+    </select>
+    
+    <select id="acheteur">
+      <option value="" disabled selected>Choisir un acheteur</option>
+    </select>
 
-  <div class="form-container">
-    <h2>Ajouter un véhicule</h2>
-    <form id="vehicleForm">
-      <input type="text" id="nomVehicule" placeholder="Nom du véhicule" required><br>
-      <input type="text" id="plaque" placeholder="Plaque d'immatriculation" required><br>
-      <input type="text" id="vendeurNom" placeholder="Nom du vendeur" required>
-      <input type="text" id="vendeurPrenom" placeholder="Prénom du vendeur" required><br>
-      <input type="text" id="acheteurNom" placeholder="Nom de l'acheteur" required>
-      <input type="text" id="acheteurPrenom" placeholder="Prénom de l'acheteur" required><br>
-      Prix du véhicule : <input type="number" id="prix" placeholder="Prix du véhicule" required><br>
-      <button type="submit">Ajouter</button>
-    </form>    
-  </div>
-
-  <div>
-    <h2>Liste des véhicules</h2>
-    <input type="text" id="searchBar" placeholder="Rechercher..." oninput="filterVehicles()">
-    <table id="vehicleTable">
-      <thead>
-        <tr>
-          <th>Nom du véhicule</th>
-          <th>Plaque</th>
-          <th>Vendeur</th>
-          <th>Acheteur</th>
-          <th>Prix</th>
-          <th>Date & Heure d'achat</th>
-        </tr>
-      </thead>
-      <tbody id="vehicleBody"></tbody>
-    </table>
-  </div>
+    Prix du véhicule : <input type="number" id="prix" placeholder="Prix du véhicule" required><br>
+    
+    <button type="submit">Ajouter</button>
+  </form>    
 
   <script>
-    const form = document.getElementById('vehicleForm');
-    const vehicleBody = document.getElementById('vehicleBody');
-    const searchInput = document.getElementById('searchBar');
-    let storedVehicles = [];
-
-    // Récupère les véhicules depuis le serveur
-    function loadVehicles() {
-      fetch('/api/vehicles')
-        .then(response => response.json())
-        .then(data => {
-          storedVehicles = data;
-          displayVehicles();
-        })
-        .catch(err => console.error('Erreur de récupération des véhicules:', err));
+    // Fonction pour récupérer les utilisateurs (vendeurs et acheteurs)
+    async function loadUsers() {
+      try {
+        const response = await fetch('/api/users');
+        const users = await response.json();
+        
+        const vendeurSelect = document.getElementById('vendeur');
+        const acheteurSelect = document.getElementById('acheteur');
+        
+        users.forEach(user => {
+          const option = document.createElement('option');
+          option.value = `${user.nom} ${user.prenom}`;
+          option.textContent = `${user.nom} ${user.prenom}`;
+          
+          if (user.role === 'vendeur') {
+            vendeurSelect.appendChild(option);
+          } else if (user.role === 'acheteur') {
+            acheteurSelect.appendChild(option);
+          }
+        });
+      } catch (err) {
+        console.error('Erreur lors du chargement des utilisateurs:', err);
+      }
     }
 
-    // Affiche les véhicules dans la table
-    function displayVehicles(vehicles = storedVehicles) {
-      vehicleBody.innerHTML = "";
-      vehicles.forEach(vehicle => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${vehicle.nomVehicule}</td>
-          <td>${vehicle.plaque}</td>
-          <td>${vehicle.vendeurNom} ${vehicle.vendeurPrenom}</td>
-          <td>${vehicle.acheteurNom} ${vehicle.acheteurPrenom}</td>
-          <td>${vehicle.prix} €</td>
-          <td>${vehicle.dateAchat} ${vehicle.heureAchat}</td>
-        `;
-        vehicleBody.appendChild(row);
-      });
-    }
-
-    // Filtre les véhicules selon la recherche
-    function filterVehicles() {
-      const searchValue = searchInput.value.toLowerCase();
-      const filtered = storedVehicles.filter(vehicle =>
-        vehicle.nomVehicule?.toLowerCase().includes(searchValue) ||
-        vehicle.plaque?.toLowerCase().includes(searchValue) ||
-        (`${vehicle.vendeurNom} ${vehicle.vendeurPrenom}`).toLowerCase().includes(searchValue) ||
-        (`${vehicle.acheteurNom} ${vehicle.acheteurPrenom}`).toLowerCase().includes(searchValue)
-      );
-      displayVehicles(filtered);
-    }
-
-    // Ajoute un nouveau véhicule
-    form.addEventListener('submit', function (e) {
+    // Fonction pour ajouter un véhicule
+    document.getElementById('vehicleForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
+      
+      const nomVehicule = document.getElementById('nomVehicule').value;
+      const plaque = document.getElementById('plaque').value;
+      const vendeur = document.getElementById('vendeur').value;
+      const acheteur = document.getElementById('acheteur').value;
       const prix = document.getElementById('prix').value;
-      const dateAchat = new Date().toLocaleDateString();
-      const heureAchat = new Date().toLocaleTimeString();
 
-      const vehicle = {
-        nomVehicule: document.getElementById('nomVehicule').value,
-        plaque: document.getElementById('plaque').value,
-        vendeurNom: document.getElementById('vendeurNom').value,
-        vendeurPrenom: document.getElementById('vendeurPrenom').value,
-        acheteurNom: document.getElementById('acheteurNom').value,
-        acheteurPrenom: document.getElementById('acheteurPrenom').value,
-        prix: prix,
-        dateAchat: dateAchat,
-        heureAchat: heureAchat
+      const [vendeurNom, vendeurPrenom] = vendeur.split(' ');
+      const [acheteurNom, acheteurPrenom] = acheteur.split(' ');
+
+      const vehicleData = {
+        nomVehicule,
+        plaque,
+        vendeurNom,
+        vendeurPrenom,
+        acheteurNom,
+        acheteurPrenom,
+        prix
       };
 
-      // Envoie les données au serveur
-      fetch('/api/vehicles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(vehicle)
-      })
-      .then(response => response.json())
-      .then(() => {
-        loadVehicles();  // Recharge les véhicules après l'ajout
-        form.reset();
-      })
-      .catch(err => console.error('Erreur lors de l\'ajout du véhicule:', err));
+      try {
+        const response = await fetch('/api/vehicles', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(vehicleData)
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert('Véhicule ajouté avec succès');
+          // Optionnel: réinitialiser le formulaire
+          document.getElementById('vehicleForm').reset();
+        } else {
+          alert('Erreur lors de l\'ajout du véhicule');
+        }
+      } catch (err) {
+        console.error('Erreur lors de l\'ajout du véhicule:', err);
+        alert('Erreur lors de l\'ajout du véhicule');
+      }
     });
 
-    // Charger les véhicules au démarrage
-    loadVehicles();
+    // Charger les utilisateurs au démarrage
+    loadUsers();
   </script>
-
 </body>
 </html>
