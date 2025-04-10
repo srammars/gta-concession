@@ -2,38 +2,31 @@ const express = require('express');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
 const app = express();
 const port = process.env.PORT || 3000;
-dotenv.config();
-app.use(express.json()); // Pour lire le JSON dans les requêtes
-app.use(express.static('public'));
 
-// Config Cloudinary
+dotenv.config();
+
+// Configurer Cloudinary avec les variables d'environnement
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
 
+// Middleware pour servir des fichiers statiques (images, etc.)
+app.use(express.static('public'));
 
-// Route accueil
+// Route pour la page d'accueil
 app.get('/', (req, res) => {
   res.send('Bienvenue sur la concession GTA!');
 });
 
-// ==========================
-// Upload (protégé)
-// ==========================
-
+// Route pour uploader les fichiers
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.post('/upload', authMiddleware, upload.fields([
-  { name: 'image' }, { name: 'permis' }, { name: 'identite' }
-]), (req, res) => {
+app.post('/upload', upload.fields([{ name: 'image' }, { name: 'permis' }, { name: 'identite' }]), (req, res) => {
   if (!req.files) {
     return res.status(400).send('Aucun fichier n\'a été téléchargé.');
   }
@@ -65,8 +58,7 @@ app.post('/upload', authMiddleware, upload.fields([
     });
 });
 
-// ==========================
-
+// Démarrer le serveur
 app.listen(port, () => {
   console.log(`Serveur backend démarré sur http://localhost:${port}`);
 });
