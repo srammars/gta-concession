@@ -126,7 +126,7 @@
 </head>
 <body>
 
-  <h1>Gestion de véhicules avec prix et date</h1>
+  <h1>Gestion de véhicules avec documents</h1>
 
   <div class="form-container">
     <h2>Ajouter un véhicule</h2>
@@ -137,7 +137,7 @@
       <input type="text" id="vendeurPrenom" placeholder="Prénom du vendeur" required><br>
       <input type="text" id="acheteurNom" placeholder="Nom de l'acheteur" required>
       <input type="text" id="acheteurPrenom" placeholder="Prénom de l'acheteur" required><br>
-      <input type="number" id="prix" placeholder="Prix du véhicule" required><br>
+      Prix du véhicule : <input type="number" id="prix" placeholder="Prix du véhicule" required><br>
       <button type="submit">Ajouter</button>
     </form>    
   </div>
@@ -153,7 +153,7 @@
           <th>Vendeur</th>
           <th>Acheteur</th>
           <th>Prix</th>
-          <th>Date et Heure d'achat</th>
+          <th>Date & Heure d'achat</th>
         </tr>
       </thead>
       <tbody id="vehicleBody"></tbody>
@@ -164,21 +164,13 @@
     const form = document.getElementById('vehicleForm');
     const vehicleBody = document.getElementById('vehicleBody');
     const searchInput = document.getElementById('searchBar');
-    const clearButton = document.getElementById('clearButton');
-  
-    // Récupérer les véhicules depuis l'API backend
-    async function fetchVehicles() {
-      try {
-        const response = await fetch('https://gta-concession.vercel.app/api/vehicles');
-        const vehicles = await response.json();
-        displayVehicles(vehicles);
-      } catch (error) {
-        console.error('Erreur de récupération des véhicules:', error);
-      }
+    let storedVehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+
+    function saveVehicles() {
+      localStorage.setItem('vehicles', JSON.stringify(storedVehicles));
     }
-  
-    // Afficher les véhicules dans le tableau
-    function displayVehicles(vehicles = []) {
+
+    function displayVehicles(vehicles = storedVehicles) {
       vehicleBody.innerHTML = "";
       vehicles.forEach(vehicle => {
         const row = document.createElement('tr');
@@ -193,15 +185,14 @@
         vehicleBody.appendChild(row);
       });
     }
-  
-    // Soumettre le formulaire pour ajouter un véhicule
+
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
-  
+
       const prix = document.getElementById('prix').value;
-      const dateAchat = new Date().toISOString().split('T')[0]; // Date actuelle
-      const heureAchat = new Date().toTimeString().split(' ')[0]; // Heure actuelle
-  
+      const dateAchat = new Date().toLocaleDateString();  // Utilise la date actuelle
+      const heureAchat = new Date().toLocaleTimeString(); // Utilise l'heure actuelle
+
       const vehicle = {
         nomVehicule: document.getElementById('nomVehicule').value,
         plaque: document.getElementById('plaque').value,
@@ -209,52 +200,46 @@
         vendeurPrenom: document.getElementById('vendeurPrenom').value,
         acheteurNom: document.getElementById('acheteurNom').value,
         acheteurPrenom: document.getElementById('acheteurPrenom').value,
-        prix: prix,                  // Ajouter le prix
-        dateAchat: dateAchat,        // Ajouter la date d'achat
-        heureAchat: heureAchat       // Ajouter l'heure d'achat
+        prix: prix,
+        dateAchat: dateAchat,
+        heureAchat: heureAchat
       };
-  
-      try {
-        const response = await fetch('https://gta-concession.vercel.app/api/vehicles', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(vehicle)
-        });
-  
-        if (response.ok) {
-          fetchVehicles(); // Rafraîchir la liste des véhicules
-          form.reset();
-        } else {
-          console.error('Erreur lors de l\'ajout du véhicule');
-        }
-      } catch (error) {
-        console.error('Erreur de communication avec le serveur:', error);
-      }
+
+      // Envoi des données au serveur via API
+      fetch('http://localhost:3000/api/vehicles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(vehicle)
+      })
+      .then(response => response.json())
+      .then(data => {
+        storedVehicles.push(data);  // Ajoute le véhicule renvoyé par l'API
+        saveVehicles();
+        displayVehicles();
+        form.reset();
+      })
+      .catch(error => {
+        console.error('Erreur lors de l\'ajout du véhicule:', error);
+        alert('Erreur lors de l\'ajout du véhicule.');
+      });
     });
-  
-    // Effacer tous les véhicules
-    clearButton.addEventListener('click', async function () {
-      if (confirm("Êtes-vous sûr de vouloir effacer tous les véhicules ?")) {
-        try {
-          const response = await fetch('https://gta-concession.vercel.app/api/vehicles', {
-            method: 'DELETE'
-          });
-  
-          if (response.ok) {
-            fetchVehicles(); // Rafraîchir la liste des véhicules
-          } else {
-            console.error('Erreur lors de l\'effacement des véhicules');
-          }
-        } catch (error) {
-          console.error('Erreur de communication avec le serveur:', error);
-        }
-      }
-    });
-  
-    // Charger les véhicules au démarrage
-    fetchVehicles();
+
+    function filterVehicles() {
+      const searchValue = searchInput.value.toLowerCase();
+      const filtered = storedVehicles.filter(vehicle =>
+        vehicle.nomVehicule?.toLowerCase().includes(searchValue) ||
+        vehicle.plaque?.toLowerCase().includes(searchValue) ||
+        `${vehicle.vendeurNom} ${vehicle.vendeurPrenom}`.toLowerCase().includes(searchValue) ||
+        `${vehicle.acheteurNom} ${vehicle.acheteurPrenom}`.toLowerCase().includes(searchValue)
+      );
+      displayVehicles(filtered);
+    }
+
+    // Affichage initial
+    displayVehicles();
   </script>
-  
 
 </body>
 </html>
