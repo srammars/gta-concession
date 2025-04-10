@@ -54,10 +54,10 @@ app.post('/ajouter_transaction', (req, res) => {
 
 // Route pour récupérer toutes les transactions (avec filtrage par recherche)
 app.get('/transactions', (req, res) => {
-    const transactions = readTransactions();
-    const searchQuery = req.query.search || ''; // Récupérer la query de recherche
+    const transactions = readTransactions();  // Récupérer les transactions depuis le fichier JSON ou une autre source
+    const searchQuery = req.query.search || '';  // Récupérer le paramètre de recherche
 
-    // Filtrer les transactions en fonction du critère de recherche
+    // Filtrer les transactions si un terme de recherche est fourni
     const filteredTransactions = transactions.filter(transaction => {
         return (
             transaction.nom_vendeur.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -68,7 +68,11 @@ app.get('/transactions', (req, res) => {
         );
     });
 
-    res.json(filteredTransactions);
+    if (filteredTransactions.length > 0) {
+        res.json(filteredTransactions);  // Réponse avec les transactions filtrées en JSON
+    } else {
+        res.status(404).send('Aucune transaction trouvée');
+    }
 });
 
 // Lancer le serveur
