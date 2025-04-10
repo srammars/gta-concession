@@ -36,7 +36,7 @@
             formData.append("permis", document.getElementById("permis").files[0]);
             formData.append("identite", document.getElementById("identite").files[0]);
 
-            fetch("http://localhost:3000/upload", {
+            fetch("/api/upload", {
                 method: "POST",
                 body: formData
             }).then(response => response.json())
