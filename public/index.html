@@ -2,206 +2,48 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Gestion de véhicules avec documents</title>
+  <title>Gestion de véhicules avec images</title>
   <style>
-   /* Style global */
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f7f7f7;
-  margin: 0;
-  padding: 0;
-}
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
 
-h1, h2 {
-  color: #333;
-  text-align: center;
-}
+    input, button {
+      margin: 5px 0;
+      padding: 8px;
+    }
 
-/* Container principal */
-.container {
-  width: 80%;
-  margin: 0 auto;
-  padding: 30px;
-}
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
 
-/* Style de la déconnexion */
-.logout {
-  float: right;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
-  margin-top: 10px;
-  transition: background-color 0.3s ease;
-}
+    th, td {
+      border: 1px solid #aaa;
+      padding: 10px;
+      text-align: left;
+      vertical-align: middle;
+    }
 
-.logout:hover {
-  background-color: #c0392b;
-}
+    th {
+      background-color: #f2f2f2;
+    }
 
-/* Animation de la transition du bouton de déconnexion */
-.logout:active {
-  transform: scale(0.95);
-}
+    .form-container {
+      margin-bottom: 20px;
+    }
 
-/* Formulaire d'ajout de véhicule */
-.form-container {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  animation: fadeIn 1s ease-in-out;
-}
-
-.form-container h2 {
-  margin-bottom: 20px;
-  font-size: 22px;
-  color: #2e86de;
-}
-
-input[type="text"], input[type="file"], button {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-}
-
-button {
-  background-color: #2e86de;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-}
-
-button:hover {
-  background-color: #1e6fc8;
-  transform: translateY(-2px);
-}
-
-button:active {
-  transform: translateY(2px);
-}
-
-/* Table des véhicules */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background-color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 1s ease-in-out;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: left;
-  vertical-align: middle;
-  transition: background-color 0.3s ease;
-}
-
-th {
-  background-color: #f4f4f4;
-  font-weight: bold;
-  color: #333;
-}
-
-td {
-  color: #555;
-}
-
-td img.preview {
-  width: 50px;
-  height: auto;
-  border-radius: 5px;
-}
-
-/* Animation de la survol des cellules du tableau */
-tr:hover {
-  background-color: #ecf0f1;
-}
-
-/* Barre de recherche */
-input[type="text"]#searchBar {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 20px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  background-color: #fff;
-  transition: border-color 0.3s ease;
-}
-
-input[type="text"]#searchBar:focus {
-  border-color: #2e86de;
-  outline: none;
-}
-
-input[type="text"]#searchBar:active {
-  border-color: #3498db;
-}
-
-/* Effet d'ombre et animation lors du focus sur les champs */
-input[type="text"]:focus, input[type="file"]:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
-  outline: none;
-  transition: box-shadow 0.3s ease;
-}
-
-/* Animation des éléments qui apparaissent */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Messages d'erreur et succès */
-.error {
-  color: red;
-  font-size: 14px;
-  margin-top: 10px;
-  text-align: center;
-  animation: slideIn 0.5s ease-in-out;
-}
-
-.success {
-  color: green;
-  font-size: 14px;
-  margin-top: 10px;
-  text-align: center;
-  animation: slideIn 0.5s ease-in-out;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(-50%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
+    img.preview {
+      width: 60px;
+      height: auto;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
+
   <h1>Gestion de véhicules avec documents</h1>
 
   <div class="form-container">
@@ -213,6 +55,8 @@ input[type="text"]:focus, input[type="file"]:focus {
       <input type="text" id="vendeurPrenom" placeholder="Prénom du vendeur" required><br>
       <input type="text" id="acheteurNom" placeholder="Nom de l'acheteur" required>
       <input type="text" id="acheteurPrenom" placeholder="Prénom de l'acheteur" required><br>
+      Pièce d'identité : <input type="file" id="carteIdentite" accept="image/*" required><br>
+      Permis de conduire : <input type="file" id="permis" accept="image/*" required><br>
       <button type="submit">Ajouter</button>
     </form>
   </div>
@@ -236,7 +80,6 @@ input[type="text"]:focus, input[type="file"]:focus {
   </div>
 
   <script>
-   
     const form = document.getElementById('vehicleForm');
     const vehicleBody = document.getElementById('vehicleBody');
     const searchInput = document.getElementById('searchBar');
@@ -262,50 +105,39 @@ input[type="text"]:focus, input[type="file"]:focus {
       });
     }
 
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert("Non autorisé. Merci de vous reconnecter.");
-        return window.location.href = 'login.html';
-      }
+      const identiteFile = document.getElementById('carteIdentite').files[0];
+      const permisFile = document.getElementById('permis').files[0];
 
-      const formData = new FormData();
-      formData.append('image', new Blob([])); // Vide ou une 3e image si besoin
-      formData.append('identite', document.getElementById('carteIdentite').files[0]);
-      formData.append('permis', document.getElementById('permis').files[0]);
+      const identiteBase64 = identiteFile ? await getBase64(identiteFile) : "";
+      const permisBase64 = permisFile ? await getBase64(permisFile) : "";
 
-      try {
-        const res = await fetch('/upload', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          body: formData
-        });
+      const vehicle = {
+        nomVehicule: document.getElementById('nomVehicule').value,
+        plaque: document.getElementById('plaque').value,
+        vendeurNom: document.getElementById('vendeurNom').value,
+        vendeurPrenom: document.getElementById('vendeurPrenom').value,
+        acheteurNom: document.getElementById('acheteurNom').value,
+        acheteurPrenom: document.getElementById('acheteurPrenom').value,
+        identite: identiteBase64,
+        permis: permisBase64
+      };
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Erreur serveur');
-
-        const vehicle = {
-          nomVehicule: document.getElementById('nomVehicule').value,
-          plaque: document.getElementById('plaque').value,
-          vendeurNom: document.getElementById('vendeurNom').value,
-          vendeurPrenom: document.getElementById('vendeurPrenom').value,
-          acheteurNom: document.getElementById('acheteurNom').value,
-          acheteurPrenom: document.getElementById('acheteurPrenom').value,
-          identite: data.identiteUrl,
-          permis: data.permisUrl
-        };
-
-        storedVehicles.push(vehicle);
-        saveVehicles();
-        displayVehicles();
-        form.reset();
-      } catch (err) {
-        alert('Erreur : ' + err.message);
-      }
+      storedVehicles.push(vehicle);
+      saveVehicles();
+      displayVehicles();
+      form.reset();
     });
 
     function filterVehicles() {
@@ -319,11 +151,7 @@ input[type="text"]:focus, input[type="file"]:focus {
       displayVehicles(filtered);
     }
 
-    function logout() {
-      localStorage.removeItem('token');
-      window.location.href = 'login.html';
-    }
-
+    // Affichage initial
     displayVehicles();
   </script>
 
