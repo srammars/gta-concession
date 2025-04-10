@@ -18,74 +18,10 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
-// Base utilisateurs (temporaire, pas de BDD ici)
-const users = [];
-
-// On ajoute un utilisateur manuel avec un mot de passe hashé
-const addUserManually = async () => {
-  const username = 'concess';
-  const password = 'smallconcess'; // Mot de passe en clair
-
-  // Vérifier si l'utilisateur existe déjà
-  if (users.find(u => u.username === username)) {
-    console.log('Utilisateur déjà existant');
-    return;
-  }
-
-  // Hash du mot de passe
-  const hashedPassword = await bcrypt.hash(password, 10);
-  
-  // Ajouter l'utilisateur à la base
-  users.push({ username, password: hashedPassword });
-  console.log('Utilisateur ajouté :', username);
-};
-
-// Appeler la fonction d'ajout d'utilisateur
-addUserManually();
-
-// Middleware d'authentification
-const SECRET = 'vraimentSecret123';
-const authMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.sendStatus(401);
-  jwt.verify(token, SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
 
 // Route accueil
 app.get('/', (req, res) => {
   res.send('Bienvenue sur la concession GTA!');
-});
-
-// ==========================
-// AUTH : Register & Login
-// ==========================
-
-// Inscription
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  if (users.find(u => u.username === username)) {
-    return res.status(400).json({ message: 'Utilisateur déjà existant' });
-  }
-  const hashed = await bcrypt.hash(password, 10);
-  users.push({ username, password: hashed });
-  res.json({ message: 'Inscription réussie' });
-});
-
-// Connexion
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(u => u.username === username);
-  if (!user) return res.status(400).json({ message: 'Utilisateur non trouvé' });
-
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(401).json({ message: 'Mot de passe incorrect' });
-
-  const token = jwt.sign({ username }, SECRET, { expiresIn: '1h' });
-  res.json({ token });
 });
 
 // ==========================
