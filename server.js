@@ -6,19 +6,29 @@ const port = 3000;
 
 // Middleware pour parser les données du formulaire
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json()); // pour gérer les données JSON
 
 // Serveur les fichiers statiques (comme index.html)
 app.use(express.static('public'));
 
 // Lire les transactions à partir du fichier JSON
 const readTransactions = () => {
-    const data = fs.readFileSync('data/transactions.json');
-    return JSON.parse(data);
+    try {
+        const data = fs.readFileSync('data/transactions.json');
+        return JSON.parse(data);
+    } catch (err) {
+        console.error('Erreur lors de la lecture du fichier JSON:', err);
+        return [];
+    }
 };
 
 // Sauvegarder les transactions dans le fichier JSON
 const saveTransactions = (transactions) => {
-    fs.writeFileSync('data/transactions.json', JSON.stringify(transactions, null, 2));
+    try {
+        fs.writeFileSync('data/transactions.json', JSON.stringify(transactions, null, 2));
+    } catch (err) {
+        console.error('Erreur lors de l\'écriture dans le fichier JSON:', err);
+    }
 };
 
 // Route pour afficher le formulaire et les transactions
@@ -30,6 +40,12 @@ app.get('/', (req, res) => {
 // Route pour ajouter une transaction
 app.post('/ajouter_transaction', (req, res) => {
     const { nom_vendeur, prenom_vendeur, nom_acheteur, prenom_acheteur, prix, nom_vehicule, type_vehicule, plaque } = req.body;
+
+    // Validation des données (exemple simple)
+    if (!nom_vendeur || !prenom_vendeur || !nom_acheteur || !prenom_acheteur || !prix || !nom_vehicule || !type_vehicule || !plaque) {
+        return res.status(400).send('Tous les champs sont requis');
+    }
+
     const date_heure = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     const newTransaction = {
