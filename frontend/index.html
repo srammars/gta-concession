@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de la Concession GTA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Gestion de la Concession GTA</h1>
+
+    <h2>Ajouter un véhicule</h2>
+    <form id="addVehicleForm" enctype="multipart/form-data">
+        <input type="text" id="marque" placeholder="Marque" required><br>
+        <input type="text" id="modele" placeholder="Modèle" required><br>
+        <input type="number" id="prix" placeholder="Prix" required><br>
+        <input type="file" id="image" accept="image/*" required><br>
+        <input type="file" id="permis" accept="image/*" required><br>
+        <input type="file" id="identite" accept="image/*" required><br>
+        <input type="text" id="vendeur" placeholder="Vendeur" required><br>
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <h2>Liste des véhicules</h2>
+    <ul id="vehicleList"></ul>
+
+    <script src="script.js"></script>
+</body>
+</html>
