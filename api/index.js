@@ -20,9 +20,31 @@ cloudinary.config({
 
 // Base utilisateurs (temporaire, pas de BDD ici)
 const users = [];
-const SECRET = 'vraimentSecret123';
+
+// On ajoute un utilisateur manuel avec un mot de passe hashé
+const addUserManually = async () => {
+  const username = 'concess';
+  const password = 'smallconcess'; // Mot de passe en clair
+
+  // Vérifier si l'utilisateur existe déjà
+  if (users.find(u => u.username === username)) {
+    console.log('Utilisateur déjà existant');
+    return;
+  }
+
+  // Hash du mot de passe
+  const hashedPassword = await bcrypt.hash(password, 10);
+  
+  // Ajouter l'utilisateur à la base
+  users.push({ username, password: hashedPassword });
+  console.log('Utilisateur ajouté :', username);
+};
+
+// Appeler la fonction d'ajout d'utilisateur
+addUserManually();
 
 // Middleware d'authentification
+const SECRET = 'vraimentSecret123';
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.sendStatus(401);
