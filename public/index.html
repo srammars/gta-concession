@@ -1,271 +1,241 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestion des Véhicules</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      padding: 20px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions Véhicules</title>
+    <style>
+        /* Style global */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+        }
 
-    h1 {
-      text-align: center;
-      color: #333;
-    }
+        h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-    .form-container {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-    }
+        h2 {
+            font-size: 1.8rem;
+            color: #34495e;
+            margin-bottom: 15px;
+        }
 
-    .form-container h2 {
-      margin-bottom: 20px;
-      font-size: 22px;
-      color: #2e86de;
-    }
+        /* Formulaire */
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
 
-    input[type="text"], input[type="number"], button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+            font-size: 1rem;
+            color: #34495e;
+        }
 
-    button {
-      background-color: #2e86de;
-      color: white;
-      cursor: pointer;
-      border: none;
-    }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 1rem;
+            color: #2c3e50;
+            background-color: #ecf0f1;
+        }
 
-    button:hover {
-      background-color: #1e6fc8;
-    }
+        input[type="submit"] {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
 
-    #vehicleTable {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
+        input[type="submit"]:hover {
+            background-color: #2980b9;
+        }
 
-    th, td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: left;
-    }
+        /* Barre de recherche */
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
 
-    th {
-      background-color: #f4f4f4;
-      font-weight: bold;
-    }
+        .search-bar input[type="text"] {
+            width: 50%;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+            margin-right: 10px;
+            outline: none;
+        }
 
-    tr:hover {
-      background-color: #ecf0f1;
-    }
+        /* Tableau */
+        table {
+            width: 80%;
+            max-width: 1000px;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    #searchBar {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 20px;
-    }
-  </style>
+        th, td {
+            padding: 12px;
+            text-align: left;
+            font-size: 1rem;
+            color: #34495e;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f4f7fc;
+        }
+
+        tr:hover {
+            background-color: #e3e7ee;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            table {
+                width: 100%;
+            }
+
+            .search-bar input[type="text"] {
+                width: 70%;
+            }
+
+            form {
+                width: 90%;
+            }
+        }
+
+    </style>
 </head>
 <body>
+    <h1>Formulaire d'enregistrement de transaction de véhicule</h1>
 
-  <h1>Gestion des Véhicules</h1>
+    <form action="/ajouter_transaction" method="POST">
+        <label for="nom_vendeur">Nom du vendeur:</label>
+        <input type="text" id="nom_vendeur" name="nom_vendeur" required><br><br>
 
-  <div class="form-container">
-    <h2>Ajouter un Vendeur</h2>
-    <form id="vendeurForm">
-      <input type="text" id="nomVendeur" placeholder="Nom du vendeur" required>
-      <input type="text" id="prenomVendeur" placeholder="Prénom du vendeur" required>
-      <button type="submit">Ajouter Vendeur</button>
+        <label for="prenom_vendeur">Prénom du vendeur:</label>
+        <input type="text" id="prenom_vendeur" name="prenom_vendeur" required><br><br>
+
+        <label for="nom_acheteur">Nom de l'acheteur:</label>
+        <input type="text" id="nom_acheteur" name="nom_acheteur" required><br><br>
+
+        <label for="prenom_acheteur">Prénom de l'acheteur:</label>
+        <input type="text" id="prenom_acheteur" name="prenom_acheteur" required><br><br>
+
+        <label for="prix">Prix:</label>
+        <input type="number" id="prix" name="prix" required><br><br>
+
+        <label for="nom_vehicule">Nom du véhicule:</label>
+        <input type="text" id="nom_vehicule" name="nom_vehicule" required><br><br>
+
+        <label for="type_vehicule">Type de véhicule:</label>
+        <input type="text" id="type_vehicule" name="type_vehicule" required><br><br>
+
+        <label for="plaque">Plaque d'immatriculation:</label>
+        <input type="text" id="plaque" name="plaque" required><br><br>
+
+        <input type="submit" value="Ajouter la transaction">
     </form>
-  </div>
 
-  <div class="form-container">
-    <h2>Ajouter un Acheteur</h2>
-    <form id="acheteurForm">
-      <input type="text" id="nomAcheteur" placeholder="Nom de l'acheteur" required>
-      <input type="text" id="prenomAcheteur" placeholder="Prénom de l'acheteur" required>
-      <button type="submit">Ajouter Acheteur</button>
-    </form>
-  </div>
+    <h2>Transactions en cours</h2>
 
-  <div class="form-container">
-    <h2>Ajouter un Véhicule</h2>
-    <form id="vehicleForm">
-      <input type="text" id="nomVehicule" placeholder="Nom du véhicule" required>
-      <input type="text" id="plaque" placeholder="Plaque d'immatriculation" required>
-      <input type="number" id="prix" placeholder="Prix du véhicule" required>
-      <select id="vendeurSelect" required></select>
-      <select id="acheteurSelect" required></select>
-      <button type="submit">Ajouter Véhicule</button>
-    </form>
-  </div>
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="Rechercher par nom, prénom ou plaque" oninput="searchTransactions()">
+    </div>
 
-  <input type="text" id="searchBar" placeholder="Rechercher...">
+    <table>
+        <thead>
+            <tr>
+                <th>Nom Vendeur</th>
+                <th>Prénom Vendeur</th>
+                <th>Nom Acheteur</th>
+                <th>Prénom Acheteur</th>
+                <th>Prix</th>
+                <th>Nom du Véhicule</th>
+                <th>Type du Véhicule</th>
+                <th>Plaque</th>
+                <th>Date et Heure</th>
+            </tr>
+        </thead>
+        <tbody id="transactionsTable">
+            <!-- Les transactions seront ajoutées ici -->
+        </tbody>
+    </table>
 
-  <table id="vehicleTable">
-    <thead>
-      <tr>
-        <th>Nom du véhicule</th>
-        <th>Plaque</th>
-        <th>Vendeur</th>
-        <th>Acheteur</th>
-        <th>Prix</th>
-        <th>Date & Heure d'achat</th>
-      </tr>
-    </thead>
-    <tbody id="vehicleBody"></tbody>
-  </table>
-
-  <script>
-    // Variables
-    const vendeurForm = document.getElementById('vendeurForm');
-    const acheteurForm = document.getElementById('acheteurForm');
-    const vehicleForm = document.getElementById('vehicleForm');
-    const vehicleBody = document.getElementById('vehicleBody');
-    const searchBar = document.getElementById('searchBar');
-    const vendeurSelect = document.getElementById('vendeurSelect');
-    const acheteurSelect = document.getElementById('acheteurSelect');
-
-    // Récupérer les utilisateurs et véhicules depuis l'API
-    async function loadUsers() {
-      try {
-        const response = await fetch('/api/users');
-        const users = await response.json();
-        updateUserSelects(users);
-      } catch (error) {
-        console.error('Erreur de récupération des utilisateurs:', error);
-      }
-    }
-
-    async function loadVehicles() {
-      try {
-        const response = await fetch('/api/vehicles');
-        const vehicles = await response.json();
-        displayVehicles(vehicles);
-      } catch (error) {
-        console.error('Erreur de récupération des véhicules:', error);
-      }
-    }
-
-    function displayVehicles(vehicles) {
-      vehicleBody.innerHTML = '';
-      vehicles.forEach(vehicle => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${vehicle.nomVehicule}</td>
-          <td>${vehicle.plaque}</td>
-          <td>${vehicle.vendeur.nom} ${vehicle.vendeur.prenom}</td>
-          <td>${vehicle.acheteur.nom} ${vehicle.acheteur.prenom}</td>
-          <td>${vehicle.prix} €</td>
-          <td>${new Date(vehicle.dateAchat).toLocaleDateString()} ${vehicle.heureAchat}</td>
-        `;
-        vehicleBody.appendChild(row);
-      });
-    }
-
-    function updateUserSelects(users) {
-      vendeurSelect.innerHTML = '';
-      acheteurSelect.innerHTML = '';
-      users.forEach(user => {
-        const option = document.createElement('option');
-        option.value = user._id;
-        option.textContent = `${user.nom} ${user.prenom}`;
-        if (user.role === 'vendeur') {
-          vendeurSelect.appendChild(option);
-        } else if (user.role === 'acheteur') {
-          acheteurSelect.appendChild(option);
+    <script>
+        // Fonction pour récupérer et afficher les transactions
+        function loadTransactions(searchQuery = '') {
+            fetch(`/transactions?search=${searchQuery}`)
+                .then(response => response.json())
+                .then(transactions => {
+                    const tbody = document.getElementById('transactionsTable');
+                    tbody.innerHTML = '';  // Clear the table
+                    transactions.forEach(transaction => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${transaction.nom_vendeur}</td>
+                            <td>${transaction.prenom_vendeur}</td>
+                            <td>${transaction.nom_acheteur}</td>
+                            <td>${transaction.prenom_acheteur}</td>
+                            <td>${transaction.prix}</td>
+                            <td>${transaction.nom_vehicule}</td>
+                            <td>${transaction.type_vehicule}</td>
+                            <td>${transaction.plaque_immatriculation}</td>
+                            <td>${transaction.date_heure}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                });
         }
-      });
-    }
 
-    // Ajouter un vendeur
-    vendeurForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nom = document.getElementById('nomVendeur').value;
-      const prenom = document.getElementById('prenomVendeur').value;
-
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nom, prenom, role: 'vendeur' })
-      });
-
-      const data = await response.json();
-      loadUsers();
-      alert(`Vendeur ajouté: ${data.nom} ${data.prenom}`);
-    });
-
-    // Ajouter un acheteur
-    acheteurForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const nom = document.getElementById('nomAcheteur').value;
-      const prenom = document.getElementById('prenomAcheteur').value;
-
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nom, prenom, role: 'acheteur' })
-      });
-
-      const data = await response.json();
-      loadUsers();
-      alert(`Acheteur ajouté: ${data.nom} ${data.prenom}`);
-    });
-
-    // Ajouter un véhicule
-    vehicleForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const nomVehicule = document.getElementById('nomVehicule').value;
-      const plaque = document.getElementById('plaque').value;
-      const prix = document.getElementById('prix').value;
-      const vendeurId = vendeurSelect.value;
-      const acheteurId = acheteurSelect.value;
-      const dateAchat = new Date().toISOString();
-      const heureAchat = new Date().toLocaleTimeString();
-
-      const response = await fetch('/api/vehicles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nomVehicule, plaque, vendeurId, acheteurId, prix, dateAchat, heureAchat })
-      });
-
-      const data = await response.json();
-      loadVehicles();
-      alert(`Véhicule ajouté: ${data.nomVehicule}`);
-    });
-
-    // Recherche
-    searchBar.addEventListener('input', () => {
-      const searchQuery = searchBar.value.toLowerCase();
-      const rows = vehicleBody.querySelectorAll('tr');
-      rows.forEach(row => {
-        const columns = row.querySelectorAll('td');
-        const nomVehicule = columns[0].textContent.toLowerCase();
-        const plaque = columns[1].textContent.toLowerCase();
-        if (nomVehicule.includes(searchQuery) || plaque.includes(searchQuery)) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
+        // Fonction de recherche
+        function searchTransactions() {
+            const searchQuery = document.getElementById('search').value;
+            loadTransactions(searchQuery);
         }
-      });
-    });
 
-    // Initialisation
-    loadUsers();
-    loadVehicles();
-  </script>
+        // Charger toutes les transactions au démarrage de la page
+        loadTransactions();
+    </script>
 </body>
 </html>
