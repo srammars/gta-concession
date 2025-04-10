@@ -3,238 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transactions Véhicules</title>
-    <style>
-        /* Style global */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fc;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            color: #333;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            color: #34495e;
-            margin-bottom: 15px;
-        }
-
-        /* Formulaire */
-        form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 600px;
-            margin-bottom: 30px;
-        }
-
-        label {
-            font-weight: bold;
-            margin-top: 10px;
-            display: block;
-            font-size: 1rem;
-            color: #34495e;
-        }
-
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            margin-top: 8px;
-            border: 1px solid #bdc3c7;
-            border-radius: 5px;
-            font-size: 1rem;
-            color: #2c3e50;
-            background-color: #ecf0f1;
-        }
-
-        input[type="submit"] {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 20px;
-            width: 100%;
-            transition: background-color 0.3s;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #2980b9;
-        }
-
-        /* Barre de recherche */
-        .search-bar {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .search-bar input[type="text"] {
-            width: 50%;
-            padding: 10px;
-            font-size: 1rem;
-            border-radius: 5px;
-            border: 1px solid #bdc3c7;
-            margin-right: 10px;
-            outline: none;
-        }
-
-        /* Tableau */
-        table {
-            width: 80%;
-            max-width: 1000px;
-            margin: 20px 0;
-            border-collapse: collapse;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            font-size: 1rem;
-            color: #34495e;
-        }
-
-        th {
-            background-color: #3498db;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f4f7fc;
-        }
-
-        tr:hover {
-            background-color: #e3e7ee;
-        }
-
-        /* Responsive Design */
-        @media screen and (max-width: 768px) {
-            table {
-                width: 100%;
-            }
-
-            .search-bar input[type="text"] {
-                width: 70%;
-            }
-
-            form {
-                width: 90%;
-            }
-        }
-
-    </style>
+    <title>Ajouter une Transaction</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Formulaire d'enregistrement de transaction de véhicule</h1>
-
-    <form action="/ajouter_transaction" method="POST">
-        <label for="nom_vendeur">Nom du vendeur:</label>
-        <input type="text" id="nom_vendeur" name="nom_vendeur" required><br><br>
-
-        <label for="prenom_vendeur">Prénom du vendeur:</label>
-        <input type="text" id="prenom_vendeur" name="prenom_vendeur" required><br><br>
-
-        <label for="nom_acheteur">Nom de l'acheteur:</label>
-        <input type="text" id="nom_acheteur" name="nom_acheteur" required><br><br>
-
-        <label for="prenom_acheteur">Prénom de l'acheteur:</label>
-        <input type="text" id="prenom_acheteur" name="prenom_acheteur" required><br><br>
-
-        <label for="prix">Prix:</label>
-        <input type="number" id="prix" name="prix" required><br><br>
-
-        <label for="nom_vehicule">Nom du véhicule:</label>
-        <input type="text" id="nom_vehicule" name="nom_vehicule" required><br><br>
-
-        <label for="type_vehicule">Type de véhicule:</label>
-        <input type="text" id="type_vehicule" name="type_vehicule" required><br><br>
-
-        <label for="plaque">Plaque d'immatriculation:</label>
-        <input type="text" id="plaque" name="plaque" required><br><br>
-
-        <input type="submit" value="Ajouter la transaction">
+    <h1>Ajouter une Transaction</h1>
+    <form id="transactionForm">
+        <input type="text" id="nom_vendeur" name="nom_vendeur" placeholder="Nom du vendeur" required>
+        <input type="text" id="prenom_vendeur" name="prenom_vendeur" placeholder="Prénom du vendeur" required>
+        <input type="text" id="nom_acheteur" name="nom_acheteur" placeholder="Nom de l'acheteur" required>
+        <input type="text" id="prenom_acheteur" name="prenom_acheteur" placeholder="Prénom de l'acheteur" required>
+        <input type="number" id="prix" name="prix" placeholder="Prix du véhicule" required>
+        <input type="text" id="nom_vehicule" name="nom_vehicule" placeholder="Nom du véhicule" required>
+        <input type="text" id="type_vehicule" name="type_vehicule" placeholder="Type du véhicule" required>
+        <input type="text" id="plaque" name="plaque" placeholder="Plaque d'immatriculation" required>
+        <button type="submit">Ajouter</button>
     </form>
 
-    <h2>Transactions en cours</h2>
-
-    <!-- Barre de recherche -->
-    <div class="search-bar">
-        <input type="text" id="search" placeholder="Rechercher par nom, prénom ou plaque" oninput="searchTransactions()">
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Nom Vendeur</th>
-                <th>Prénom Vendeur</th>
-                <th>Nom Acheteur</th>
-                <th>Prénom Acheteur</th>
-                <th>Prix</th>
-                <th>Nom du Véhicule</th>
-                <th>Type du Véhicule</th>
-                <th>Plaque</th>
-                <th>Date et Heure</th>
-            </tr>
-        </thead>
-        <tbody id="transactionsTable">
-            <!-- Les transactions seront ajoutées ici -->
-        </tbody>
-    </table>
+    <h2>Transactions enregistées</h2>
+    <div id="transactionsContainer"></div>
 
     <script>
-        // Fonction pour récupérer et afficher les transactions
-        function loadTransactions(searchQuery = '') {
-            fetch(`/transactions?search=${searchQuery}`)
-                .then(response => response.json())
-                .then(transactions => {
-                    const tbody = document.getElementById('transactionsTable');
-                    tbody.innerHTML = '';  // Clear the table
-                    transactions.forEach(transaction => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${transaction.nom_vendeur}</td>
-                            <td>${transaction.prenom_vendeur}</td>
-                            <td>${transaction.nom_acheteur}</td>
-                            <td>${transaction.prenom_acheteur}</td>
-                            <td>${transaction.prix}</td>
-                            <td>${transaction.nom_vehicule}</td>
-                            <td>${transaction.type_vehicule}</td>
-                            <td>${transaction.plaque_immatriculation}</td>
-                            <td>${transaction.date_heure}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
+        document.getElementById('transactionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            try {
+                const response = await fetch('/ajouter_transaction', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
                 });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Transaction ajoutée avec succès');
+                    loadTransactions();
+                } else {
+                    alert('Erreur lors de l\'ajout de la transaction');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        });
+
+        async function loadTransactions() {
+            const response = await fetch('/transactions');
+            const transactions = await response.json();
+            const container = document.getElementById('transactionsContainer');
+            container.innerHTML = '';
+            transactions.forEach(transaction => {
+                const div = document.createElement('div');
+                div.textContent = `${transaction.nom_vendeur} ${transaction.prenom_vendeur} a vendu ${transaction.nom_vehicule} à ${transaction.nom_acheteur} ${transaction.prenom_acheteur} pour ${transaction.prix}€ - Plaque: ${transaction.plaque_immatriculation}`;
+                container.appendChild(div);
+            });
         }
 
-        // Fonction de recherche
-        function searchTransactions() {
-            const searchQuery = document.getElementById('search').value;
-            loadTransactions(searchQuery);
-        }
-
-        // Charger toutes les transactions au démarrage de la page
+        // Charger les transactions au démarrage
         loadTransactions();
     </script>
 </body>

@@ -4,9 +4,9 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
 
-// Middleware pour parser les données JSON et les données de formulaire
+// Middleware pour parser les données du formulaire
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // Pour gérer les données JSON
 
 // Serveur les fichiers statiques (comme index.html)
 app.use(express.static('public'));
@@ -31,12 +31,12 @@ const saveTransactions = (transactions) => {
     }
 };
 
-// Route principale pour afficher le formulaire
+// Route pour afficher le formulaire et les transactions
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
 
-// Route pour ajouter une transaction (POST)
+// Route pour ajouter une transaction
 app.post('/ajouter_transaction', (req, res) => {
     const { nom_vendeur, prenom_vendeur, nom_acheteur, prenom_acheteur, prix, nom_vehicule, type_vehicule, plaque } = req.body;
 
@@ -67,12 +67,12 @@ app.post('/ajouter_transaction', (req, res) => {
     res.status(200).send({ message: 'Transaction ajoutée avec succès' });
 });
 
-// Route pour récupérer toutes les transactions (GET avec recherche)
+// Route pour récupérer toutes les transactions (avec filtrage par recherche)
 app.get('/transactions', (req, res) => {
     const transactions = readTransactions();
     const searchQuery = req.query.search || '';
 
-    // Filtrer les transactions si un terme de recherche est fourni
+    // Filtrage des transactions si un terme de recherche est fourni
     const filteredTransactions = transactions.filter(transaction => {
         return (
             transaction.nom_vendeur.toLowerCase().includes(searchQuery.toLowerCase()) ||
