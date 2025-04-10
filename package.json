@@ -19,9 +19,11 @@
   "homepage": "https://github.com/srammars/gta-concession#readme",
   "description": "Gestion de concession automobile GTA",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "cloudinary": "^2.6.0",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.2"
   }
 }

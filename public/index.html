@@ -1,82 +1,339 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Concession GTA</title>
+  <meta charset="UTF-8">
+  <title>Gestion de véhicules avec documents</title>
+  <style>
+   /* Style global */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f7f7f7;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2 {
+  color: #333;
+  text-align: center;
+}
+
+/* Container principal */
+.container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+/* Style de la déconnexion */
+.logout {
+  float: right;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.logout:hover {
+  background-color: #c0392b;
+}
+
+/* Animation de la transition du bouton de déconnexion */
+.logout:active {
+  transform: scale(0.95);
+}
+
+/* Formulaire d'ajout de véhicule */
+.form-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #2e86de;
+}
+
+input[type="text"], input[type="file"], button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+button {
+  background-color: #2e86de;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+
+button:hover {
+  background-color: #1e6fc8;
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(2px);
+}
+
+/* Table des véhicules */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 1s ease-in-out;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  vertical-align: middle;
+  transition: background-color 0.3s ease;
+}
+
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  color: #333;
+}
+
+td {
+  color: #555;
+}
+
+td img.preview {
+  width: 50px;
+  height: auto;
+  border-radius: 5px;
+}
+
+/* Animation de la survol des cellules du tableau */
+tr:hover {
+  background-color: #ecf0f1;
+}
+
+/* Barre de recherche */
+input[type="text"]#searchBar {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]#searchBar:focus {
+  border-color: #2e86de;
+  outline: none;
+}
+
+input[type="text"]#searchBar:active {
+  border-color: #3498db;
+}
+
+/* Effet d'ombre et animation lors du focus sur les champs */
+input[type="text"]:focus, input[type="file"]:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+
+/* Animation des éléments qui apparaissent */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Messages d'erreur et succès */
+.error {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+  animation: slideIn 0.5s ease-in-out;
+}
+
+.success {
+  color: green;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+  animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+  </style>
 </head>
 <body>
-    <h1>Bienvenue dans la Concession GTA!</h1>
 
-    <h2>Liste des véhicules ajoutés</h2>
-    <ul id="vehicleList">
-        <!-- Liste des véhicules sera ajoutée ici dynamiquement -->
-    </ul>
+  <button class="logout" onclick="logout()">Déconnexion</button>
+  <h1>Gestion de véhicules avec documents</h1>
 
+  <div class="form-container">
     <h2>Ajouter un véhicule</h2>
-    <form id="addVehicleForm" enctype="multipart/form-data">
-        <input type="text" id="marque" placeholder="Marque" required><br>
-        <input type="text" id="modele" placeholder="Modèle" required><br>
-        <input type="number" id="prix" placeholder="Prix" required><br>
-        <input type="file" id="image" name="image" accept="image/*"><br>
-        <input type="file" id="permis" name="permis" accept="image/*"><br>
-        <input type="file" id="identite" name="identite" accept="image/*"><br>
-        <button type="submit">Ajouter</button>
+    <form id="vehicleForm">
+      <input type="text" id="nomVehicule" placeholder="Nom du véhicule" required><br>
+      <input type="text" id="plaque" placeholder="Plaque d'immatriculation" required><br>
+      <input type="text" id="vendeurNom" placeholder="Nom du vendeur" required>
+      <input type="text" id="vendeurPrenom" placeholder="Prénom du vendeur" required><br>
+      <input type="text" id="acheteurNom" placeholder="Nom de l'acheteur" required>
+      <input type="text" id="acheteurPrenom" placeholder="Prénom de l'acheteur" required><br>
+      Pièce d'identité : <input type="file" id="carteIdentite" accept="image/*" required><br>
+      Permis de conduire : <input type="file" id="permis" accept="image/*" required><br>
+      <button type="submit">Ajouter</button>
     </form>
+  </div>
 
-    <script>
-        // Déclarer un tableau de véhicules pour le test
-        const vehicles = [];
+  <div>
+    <h2>Liste des véhicules</h2>
+    <input type="text" id="searchBar" placeholder="Rechercher..." oninput="filterVehicles()">
+    <table id="vehicleTable">
+      <thead>
+        <tr>
+          <th>Nom du véhicule</th>
+          <th>Plaque</th>
+          <th>Vendeur</th>
+          <th>Acheteur</th>
+          <th>Identité</th>
+          <th>Permis</th>
+        </tr>
+      </thead>
+      <tbody id="vehicleBody"></tbody>
+    </table>
+  </div>
 
-        document.getElementById("addVehicleForm").addEventListener("submit", function(e) {
-            e.preventDefault();
+  <script>
+    // Redirection si non connecté
+    if (!localStorage.getItem('token')) {
+      window.location.href = 'login.html';
+    }
 
-            const formData = new FormData();
-            formData.append("image", document.getElementById("image").files[0]);
-            formData.append("permis", document.getElementById("permis").files[0]);
-            formData.append("identite", document.getElementById("identite").files[0]);
+    const form = document.getElementById('vehicleForm');
+    const vehicleBody = document.getElementById('vehicleBody');
+    const searchInput = document.getElementById('searchBar');
+    let storedVehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
 
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                vehicles.push({
-                    marque: document.getElementById("marque").value,
-                    modele: document.getElementById("modele").value,
-                    prix: document.getElementById("prix").value,
-                    imageUrl: data.imageUrl,
-                    permisUrl: data.permisUrl,
-                    identiteUrl: data.identiteUrl
-                });
+    function saveVehicles() {
+      localStorage.setItem('vehicles', JSON.stringify(storedVehicles));
+    }
 
-                // Afficher le véhicule ajouté
-                displayVehicles();
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Erreur lors du téléchargement des fichiers');
-            });
+    function displayVehicles(vehicles = storedVehicles) {
+      vehicleBody.innerHTML = "";
+      vehicles.forEach(vehicle => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${vehicle.nomVehicule}</td>
+          <td>${vehicle.plaque}</td>
+          <td>${vehicle.vendeurNom} ${vehicle.vendeurPrenom}</td>
+          <td>${vehicle.acheteurNom} ${vehicle.acheteurPrenom}</td>
+          <td><img src="${vehicle.identite}" class="preview"></td>
+          <td><img src="${vehicle.permis}" class="preview"></td>
+        `;
+        vehicleBody.appendChild(row);
+      });
+    }
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("Non autorisé. Merci de vous reconnecter.");
+        return window.location.href = 'login.html';
+      }
+
+      const formData = new FormData();
+      formData.append('image', new Blob([])); // Vide ou une 3e image si besoin
+      formData.append('identite', document.getElementById('carteIdentite').files[0]);
+      formData.append('permis', document.getElementById('permis').files[0]);
+
+      try {
+        const res = await fetch('/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
         });
 
-        function displayVehicles() {
-            const vehicleList = document.getElementById("vehicleList");
-            vehicleList.innerHTML = '';  // Clear existing list
-            vehicles.forEach(vehicle => {
-                const li = document.createElement("li");
-                li.innerHTML = `
-                    <h3>${vehicle.marque} ${vehicle.modele}</h3>
-                    <p>Prix: ${vehicle.prix} €</p>
-                    <img src="${vehicle.imageUrl}" alt="Image véhicule" width="150"><br>
-                    <a href="${vehicle.permisUrl}" target="_blank">Voir Permis</a><br>
-                    <a href="${vehicle.identiteUrl}" target="_blank">Voir Identité</a>
-                `;
-                vehicleList.appendChild(li);
-            });
-        }
-    </script>
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Erreur serveur');
+
+        const vehicle = {
+          nomVehicule: document.getElementById('nomVehicule').value,
+          plaque: document.getElementById('plaque').value,
+          vendeurNom: document.getElementById('vendeurNom').value,
+          vendeurPrenom: document.getElementById('vendeurPrenom').value,
+          acheteurNom: document.getElementById('acheteurNom').value,
+          acheteurPrenom: document.getElementById('acheteurPrenom').value,
+          identite: data.identiteUrl,
+          permis: data.permisUrl
+        };
+
+        storedVehicles.push(vehicle);
+        saveVehicles();
+        displayVehicles();
+        form.reset();
+      } catch (err) {
+        alert('Erreur : ' + err.message);
+      }
+    });
+
+    function filterVehicles() {
+      const searchValue = searchInput.value.toLowerCase();
+      const filtered = storedVehicles.filter(vehicle =>
+        (vehicle.nomVehicule?.toLowerCase().includes(searchValue)) ||
+        (vehicle.plaque?.toLowerCase().includes(searchValue)) ||
+        (`${vehicle.vendeurNom} ${vehicle.vendeurPrenom}`.toLowerCase().includes(searchValue)) ||
+        (`${vehicle.acheteurNom} ${vehicle.acheteurPrenom}`.toLowerCase().includes(searchValue))
+      );
+      displayVehicles(filtered);
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    displayVehicles();
+  </script>
+
 </body>
 </html>

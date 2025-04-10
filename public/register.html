@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Inscription</title>
+</head>
+<body>
+    <style>body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      
+      form {
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        width: 300px;
+      }
+      
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+      
+      input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #2e86de;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      
+      button:hover {
+        background-color: #1e6fc8;
+      }
+      
+      p {
+        text-align: center;
+        margin-top: 10px;
+      }
+      
+      a {
+        color: #2e86de;
+        text-decoration: none;
+      }
+      
+      a:hover {
+        text-decoration: underline;
+      }
+      </style>
+  
+  <form id="registerForm">
+    <h1>Créer un compte</h1>
+    <input type="text" id="username" placeholder="Nom d'utilisateur" required><br>
+    <input type="password" id="password" placeholder="Mot de passe" required><br>
+    <button type="submit">S'inscrire</button>
+    <p>Déjà un compte ? <a href="login.html">Connexion</a></p>
+
+  </form>
+  
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('Inscription réussie !');
+        window.location.href = 'login.html';
+      } else {
+        alert(data.message);
+      }
+    });
+  </script>
+</body>
+</html>

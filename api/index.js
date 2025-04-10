@@ -2,31 +2,80 @@ const express = require('express');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 const app = express();
 const port = process.env.PORT || 3000;
-
 dotenv.config();
+app.use(express.json()); // Pour lire le JSON dans les requêtes
+app.use(express.static('public'));
 
-// Configurer Cloudinary avec les variables d'environnement
+// Config Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
 
-// Middleware pour servir des fichiers statiques (images, etc.)
-app.use(express.static('public'));
+// Base utilisateurs (temporaire, pas de BDD ici)
+const users = [];
+const SECRET = 'vraimentSecret123';
 
-// Route pour la page d'accueil
+// Middleware d'authentification
+const authMiddleware = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.sendStatus(401);
+  jwt.verify(token, SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+// Route accueil
 app.get('/', (req, res) => {
   res.send('Bienvenue sur la concession GTA!');
 });
 
-// Route pour uploader les fichiers
+// ==========================
+// AUTH : Register & Login
+// ==========================
+
+// Inscription
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  if (users.find(u => u.username === username)) {
+    return res.status(400).json({ message: 'Utilisateur déjà existant' });
+  }
+  const hashed = await bcrypt.hash(password, 10);
+  users.push({ username, password: hashed });
+  res.json({ message: 'Inscription réussie' });
+});
+
+// Connexion
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username);
+  if (!user) return res.status(400).json({ message: 'Utilisateur non trouvé' });
+
+  const valid = await bcrypt.compare(password, user.password);
+  if (!valid) return res.status(401).json({ message: 'Mot de passe incorrect' });
+
+  const token = jwt.sign({ username }, SECRET, { expiresIn: '1h' });
+  res.json({ token });
+});
+
+// ==========================
+// Upload (protégé)
+// ==========================
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.post('/upload', upload.fields([{ name: 'image' }, { name: 'permis' }, { name: 'identite' }]), (req, res) => {
+app.post('/upload', authMiddleware, upload.fields([
+  { name: 'image' }, { name: 'permis' }, { name: 'identite' }
+]), (req, res) => {
   if (!req.files) {
     return res.status(400).send('Aucun fichier n\'a été téléchargé.');
   }
@@ -58,7 +107,8 @@ app.post('/upload', upload.fields([{ name: 'image' }, { name: 'permis' }, { name
     });
 });
 
-// Démarrer le serveur
+// ==========================
+
 app.listen(port, () => {
   console.log(`Serveur backend démarré sur http://localhost:${port}`);
 });
