@@ -1,0 +1,17 @@
+{
+    "name": "gta-concession",
+    "version": "1.0.0",
+    "description": "Backend pour gérer les véhicules et clients dans une concession GTA",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "mysql2": "^2.2.5",
+      "cors": "^2.8.5",
+      "multer": "^1.4.3",
+      "cloudinary": "^1.26.0"
+    }
+  }
+  
