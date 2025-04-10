@@ -164,13 +164,21 @@
     const form = document.getElementById('vehicleForm');
     const vehicleBody = document.getElementById('vehicleBody');
     const searchInput = document.getElementById('searchBar');
-    let storedVehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
-
-    function saveVehicles() {
-      localStorage.setItem('vehicles', JSON.stringify(storedVehicles));
+    const clearButton = document.getElementById('clearButton');
+  
+    // Récupérer les véhicules depuis l'API backend
+    async function fetchVehicles() {
+      try {
+        const response = await fetch('http://localhost:3000/api/vehicles');
+        const vehicles = await response.json();
+        displayVehicles(vehicles);
+      } catch (error) {
+        console.error('Erreur de récupération des véhicules:', error);
+      }
     }
-
-    function displayVehicles(vehicles = storedVehicles) {
+  
+    // Afficher les véhicules dans le tableau
+    function displayVehicles(vehicles = []) {
       vehicleBody.innerHTML = "";
       vehicles.forEach(vehicle => {
         const row = document.createElement('tr');
@@ -179,21 +187,21 @@
           <td>${vehicle.plaque}</td>
           <td>${vehicle.vendeurNom} ${vehicle.vendeurPrenom}</td>
           <td>${vehicle.acheteurNom} ${vehicle.acheteurPrenom}</td>
-          <td>${vehicle.prix} €</td>               <!-- Afficher le prix -->
-          <td>${vehicle.dateAchat} ${vehicle.heureAchat}</td> <!-- Afficher la date et l'heure d'achat -->
+          <td>${vehicle.prix} €</td>
+          <td>${vehicle.dateAchat} ${vehicle.heureAchat}</td>
         `;
         vehicleBody.appendChild(row);
       });
     }
-
-    form.addEventListener('submit', function (e) {
+  
+    // Soumettre le formulaire pour ajouter un véhicule
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
-
-      // Récupérer les nouvelles informations ajoutées
+  
       const prix = document.getElementById('prix').value;
-      const dateAchat = new Date().toISOString().split('T')[0]; // Date actuelle au format YYYY-MM-DD
-      const heureAchat = new Date().toTimeString().split(' ')[0]; // Heure actuelle au format HH:MM:SS
-
+      const dateAchat = new Date().toISOString().split('T')[0]; // Date actuelle
+      const heureAchat = new Date().toTimeString().split(' ')[0]; // Heure actuelle
+  
       const vehicle = {
         nomVehicule: document.getElementById('nomVehicule').value,
         plaque: document.getElementById('plaque').value,
@@ -205,26 +213,48 @@
         dateAchat: dateAchat,        // Ajouter la date d'achat
         heureAchat: heureAchat       // Ajouter l'heure d'achat
       };
-
-      storedVehicles.push(vehicle);
-      saveVehicles();
-      displayVehicles();
-      form.reset();
+  
+      try {
+        const response = await fetch('http://localhost:3000/api/vehicles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(vehicle)
+        });
+  
+        if (response.ok) {
+          fetchVehicles(); // Rafraîchir la liste des véhicules
+          form.reset();
+        } else {
+          console.error('Erreur lors de l\'ajout du véhicule');
+        }
+      } catch (error) {
+        console.error('Erreur de communication avec le serveur:', error);
+      }
     });
-
-    function filterVehicles() {
-      const searchValue = searchInput.value.toLowerCase();
-      const filtered = storedVehicles.filter(vehicle =>
-        (vehicle.nomVehicule?.toLowerCase().includes(searchValue)) ||
-        (vehicle.plaque?.toLowerCase().includes(searchValue)) ||
-        (`${vehicle.vendeurNom} ${vehicle.vendeurPrenom}`.toLowerCase().includes(searchValue)) ||
-        (`${vehicle.acheteurNom} ${vehicle.acheteurPrenom}`.toLowerCase().includes(searchValue))
-      );
-      displayVehicles(filtered);
-    }
-    // Affichage initial
-    displayVehicles();
+  
+    // Effacer tous les véhicules
+    clearButton.addEventListener('click', async function () {
+      if (confirm("Êtes-vous sûr de vouloir effacer tous les véhicules ?")) {
+        try {
+          const response = await fetch('http://localhost:3000/api/vehicles', {
+            method: 'DELETE'
+          });
+  
+          if (response.ok) {
+            fetchVehicles(); // Rafraîchir la liste des véhicules
+          } else {
+            console.error('Erreur lors de l\'effacement des véhicules');
+          }
+        } catch (error) {
+          console.error('Erreur de communication avec le serveur:', error);
+        }
+      }
+    });
+  
+    // Charger les véhicules au démarrage
+    fetchVehicles();
   </script>
+  
 
 </body>
 </html>
