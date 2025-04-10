@@ -1,27 +1,32 @@
-require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-
+const dotenv = require('dotenv');
 const app = express();
-const port = 3000;  // Port par défaut pour développement, mais Vercel choisira automatiquement un port.
+const port = process.env.PORT || 3000;
 
+dotenv.config();
+
+// Configurer Cloudinary avec les variables d'environnement
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
 
+// Middleware pour servir des fichiers statiques (images, etc.)
+app.use(express.static('public'));
+
+// Route pour la page d'accueil
+app.get('/', (req, res) => {
+  res.send('Bienvenue sur la concession GTA!');
+});
+
+// Route pour uploader les fichiers
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.use(express.json());
-
-app.post('/upload', upload.fields([
-  { name: 'image' }, 
-  { name: 'permis' }, 
-  { name: 'identite' }
-]), (req, res) => {
+app.post('/upload', upload.fields([{ name: 'image' }, { name: 'permis' }, { name: 'identite' }]), (req, res) => {
   if (!req.files) {
     return res.status(400).send('Aucun fichier n\'a été téléchargé.');
   }
@@ -53,6 +58,7 @@ app.post('/upload', upload.fields([
     });
 });
 
+// Démarrer le serveur
 app.listen(port, () => {
   console.log(`Serveur backend démarré sur http://localhost:${port}`);
 });

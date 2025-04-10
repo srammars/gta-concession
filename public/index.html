@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Concession GTA</title>
+</head>
+<body>
+    <h1>Bienvenue dans la Concession GTA!</h1>
+
+    <h2>Liste des véhicules ajoutés</h2>
+    <ul id="vehicleList">
+        <!-- Liste des véhicules sera ajoutée ici dynamiquement -->
+    </ul>
+
+    <h2>Ajouter un véhicule</h2>
+    <form id="addVehicleForm" enctype="multipart/form-data">
+        <input type="text" id="marque" placeholder="Marque" required><br>
+        <input type="text" id="modele" placeholder="Modèle" required><br>
+        <input type="number" id="prix" placeholder="Prix" required><br>
+        <input type="file" id="image" name="image" accept="image/*"><br>
+        <input type="file" id="permis" name="permis" accept="image/*"><br>
+        <input type="file" id="identite" name="identite" accept="image/*"><br>
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <script>
+        // Déclarer un tableau de véhicules pour le test
+        const vehicles = [];
+
+        document.getElementById("addVehicleForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const formData = new FormData();
+            formData.append("image", document.getElementById("image").files[0]);
+            formData.append("permis", document.getElementById("permis").files[0]);
+            formData.append("identite", document.getElementById("identite").files[0]);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                vehicles.push({
+                    marque: document.getElementById("marque").value,
+                    modele: document.getElementById("modele").value,
+                    prix: document.getElementById("prix").value,
+                    imageUrl: data.imageUrl,
+                    permisUrl: data.permisUrl,
+                    identiteUrl: data.identiteUrl
+                });
+
+                // Afficher le véhicule ajouté
+                displayVehicles();
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors du téléchargement des fichiers');
+            });
+        });
+
+        function displayVehicles() {
+            const vehicleList = document.getElementById("vehicleList");
+            vehicleList.innerHTML = '';  // Clear existing list
+            vehicles.forEach(vehicle => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <h3>${vehicle.marque} ${vehicle.modele}</h3>
+                    <p>Prix: ${vehicle.prix} €</p>
+                    <img src="${vehicle.imageUrl}" alt="Image véhicule" width="150"><br>
+                    <a href="${vehicle.permisUrl}" target="_blank">Voir Permis</a><br>
+                    <a href="${vehicle.identiteUrl}" target="_blank">Voir Identité</a>
+                `;
+                vehicleList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
