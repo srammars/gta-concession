@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Gestion de véhicules avec prix et date</title>
+  <title>Gestion de véhicules</title>
   <style>
+    /* Styles (inchangés) */
     body {
       font-family: 'Arial', sans-serif;
       background-color: #f7f7f7;
@@ -16,6 +17,7 @@
       text-align: center;
     }
 
+    /* Container principal */
     .container {
       width: 80%;
       margin: 0 auto;
@@ -28,13 +30,6 @@
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    .form-container h2 {
-      margin-bottom: 20px;
-      font-size: 22px;
-      color: #2e86de;
     }
 
     input[type="text"], input[type="number"], button {
@@ -44,7 +39,6 @@
       box-sizing: border-box;
       border: 1px solid #ccc;
       border-radius: 5px;
-      transition: all 0.3s ease;
     }
 
     button {
@@ -57,42 +51,24 @@
 
     button:hover {
       background-color: #1e6fc8;
-      transform: translateY(-2px);
     }
 
-    button:active {
-      transform: translateY(2px);
-    }
-
+    /* Table des véhicules */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
       background-color: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 1s ease-in-out;
     }
 
     th, td {
       border: 1px solid #ddd;
       padding: 12px;
       text-align: left;
-      vertical-align: middle;
-      transition: background-color 0.3s ease;
     }
 
     th {
       background-color: #f4f4f4;
-      font-weight: bold;
-      color: #333;
-    }
-
-    td {
-      color: #555;
-    }
-
-    tr:hover {
-      background-color: #ecf0f1;
     }
 
     input[type="text"]#searchBar {
@@ -102,31 +78,12 @@
       box-sizing: border-box;
       border: 1px solid #ccc;
       border-radius: 5px;
-      font-size: 16px;
-      background-color: #fff;
-      transition: border-color 0.3s ease;
-    }
-
-    input[type="text"]#searchBar:focus {
-      border-color: #2e86de;
-      outline: none;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
   </style>
 </head>
 <body>
 
-  <h1>Gestion de véhicules avec documents</h1>
+  <h1>Gestion de véhicules</h1>
 
   <div class="form-container">
     <h2>Ajouter un véhicule</h2>
@@ -164,7 +121,16 @@
     const form = document.getElementById('vehicleForm');
     const vehicleBody = document.getElementById('vehicleBody');
     const searchInput = document.getElementById('searchBar');
-    let storedVehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+    let storedVehicles = [];
+
+    // Récupère les véhicules depuis le localStorage (si existant)
+    function loadVehicles() {
+      const storedData = localStorage.getItem('vehicles');
+      if (storedData) {
+        storedVehicles = JSON.parse(storedData);
+        displayVehicles();
+      }
+    }
 
     function saveVehicles() {
       localStorage.setItem('vehicles', JSON.stringify(storedVehicles));
@@ -186,12 +152,23 @@
       });
     }
 
-    form.addEventListener('submit', async function (e) {
+    function filterVehicles() {
+      const searchValue = searchInput.value.toLowerCase();
+      const filtered = storedVehicles.filter(vehicle =>
+        vehicle.nomVehicule?.toLowerCase().includes(searchValue) ||
+        vehicle.plaque?.toLowerCase().includes(searchValue) ||
+        (`${vehicle.vendeurNom} ${vehicle.vendeurPrenom}`).toLowerCase().includes(searchValue) ||
+        (`${vehicle.acheteurNom} ${vehicle.acheteurPrenom}`).toLowerCase().includes(searchValue)
+      );
+      displayVehicles(filtered);
+    }
+
+    form.addEventListener('submit', function (e) {
       e.preventDefault();
 
       const prix = document.getElementById('prix').value;
-      const dateAchat = new Date().toLocaleDateString();  // Utilise la date actuelle
-      const heureAchat = new Date().toLocaleTimeString(); // Utilise l'heure actuelle
+      const dateAchat = new Date().toLocaleDateString();  // Date actuelle
+      const heureAchat = new Date().toLocaleTimeString(); // Heure actuelle
 
       const vehicle = {
         nomVehicule: document.getElementById('nomVehicule').value,
@@ -205,40 +182,14 @@
         heureAchat: heureAchat
       };
 
-      // Envoi des données au serveur via API
-      fetch('http://localhost:3000/api/vehicles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(vehicle)
-      })
-      .then(response => response.json())
-      .then(data => {
-        storedVehicles.push(data);  // Ajoute le véhicule renvoyé par l'API
-        saveVehicles();
-        displayVehicles();
-        form.reset();
-      })
-      .catch(error => {
-        console.error('Erreur lors de l\'ajout du véhicule:', error);
-        alert('Erreur lors de l\'ajout du véhicule.');
-      });
+      storedVehicles.push(vehicle);
+      saveVehicles();
+      displayVehicles();
+      form.reset();
     });
 
-    function filterVehicles() {
-      const searchValue = searchInput.value.toLowerCase();
-      const filtered = storedVehicles.filter(vehicle =>
-        vehicle.nomVehicule?.toLowerCase().includes(searchValue) ||
-        vehicle.plaque?.toLowerCase().includes(searchValue) ||
-        `${vehicle.vendeurNom} ${vehicle.vendeurPrenom}`.toLowerCase().includes(searchValue) ||
-        `${vehicle.acheteurNom} ${vehicle.acheteurPrenom}`.toLowerCase().includes(searchValue)
-      );
-      displayVehicles(filtered);
-    }
-
     // Affichage initial
-    displayVehicles();
+    loadVehicles();
   </script>
 
 </body>

@@ -1,20 +1,7 @@
 const express = require('express');
-const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const dotenv = require('dotenv');
 const app = express();
 const port = process.env.PORT || 3000;
 
-dotenv.config();
-
-// Configurer Cloudinary avec les variables d'environnement
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-});
-
-// Middleware pour analyser les données JSON
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -28,14 +15,17 @@ app.get('/api/vehicles', (req, res) => {
 
 // Route pour ajouter un véhicule
 app.post('/api/vehicles', (req, res) => {
-  const { nomVehicule, plaque, vendeurNom, vendeurPrenom, acheteurNom, acheteurPrenom, prix, dateAchat, heureAchat } = req.body;
+  const { nomVehicule, plaque, vendeurNom, vendeurPrenom, acheteurNom, acheteurPrenom, prix } = req.body;
 
   if (!nomVehicule || !plaque || !vendeurNom || !vendeurPrenom || !acheteurNom || !acheteurPrenom || !prix) {
     return res.status(400).json({ error: 'Tous les champs sont requis.' });
   }
 
-  // Simuler l'ajout d'un véhicule (sans base de données réelle)
-  const newVehicle = {
+  // Date et heure actuelles
+  const dateAchat = new Date().toLocaleDateString();
+  const heureAchat = new Date().toLocaleTimeString();
+
+  const vehicle = {
     nomVehicule,
     plaque,
     vendeurNom,
@@ -47,8 +37,8 @@ app.post('/api/vehicles', (req, res) => {
     heureAchat
   };
 
-  storedVehicles.push(newVehicle);
-  res.status(201).json(newVehicle);
+  storedVehicles.push(vehicle);
+  res.status(201).json(vehicle);
 });
 
 // Démarrer le serveur
