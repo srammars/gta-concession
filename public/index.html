@@ -212,9 +212,9 @@ input[type="text"]:focus, input[type="file"]:focus {
       <input type="text" id="vendeurNom" placeholder="Nom du vendeur" required>
       <input type="text" id="vendeurPrenom" placeholder="Prénom du vendeur" required><br>
       <input type="text" id="acheteurNom" placeholder="Nom de l'acheteur" required>
-      <input type="text" id="acheteurPrenom" placeholder="Prénom de l'acheteur" required><br>
-      Pièce d'identité : <input type="file" id="carteIdentite" accept="image/*" required><br>
-      Permis de conduire : <input type="file" id="permis" accept="image/*" required><br>
+      <input type="number" id="prix" placeholder="Prix du véhicule" required><br>
+      <input type="date" id="dateAchat" required><br>
+      <input type="time" id="heureAchat" required><br>
       <button type="submit">Ajouter</button>
     </form>
   </div>
@@ -256,12 +256,13 @@ input[type="text"]:focus, input[type="file"]:focus {
           <td>${vehicle.plaque}</td>
           <td>${vehicle.vendeurNom} ${vehicle.vendeurPrenom}</td>
           <td>${vehicle.acheteurNom} ${vehicle.acheteurPrenom}</td>
-          <td><img src="${vehicle.identite}" class="preview"></td>
-          <td><img src="${vehicle.permis}" class="preview"></td>
+          <td>${vehicle.prix} €</td>               <!-- Afficher le prix -->
+          <td>${vehicle.dateAchat} ${vehicle.heureAchat}</td> <!-- Afficher la date et l'heure d'achat -->
         `;
         vehicleBody.appendChild(row);
       });
     }
+
 
     function getBase64(file) {
       return new Promise((resolve, reject) => {
@@ -273,30 +274,39 @@ input[type="text"]:focus, input[type="file"]:focus {
     }
 
     form.addEventListener('submit', async function (e) {
-      e.preventDefault();
+    e.preventDefault();
 
-      const identiteFile = document.getElementById('carteIdentite').files[0];
-      const permisFile = document.getElementById('permis').files[0];
+    // Récupérer les nouvelles informations ajoutées
+    const prix = document.getElementById('prix').value;
+    const dateAchat = document.getElementById('dateAchat').value;
+    const heureAchat = document.getElementById('heureAchat').value;
 
-      const identiteBase64 = identiteFile ? await getBase64(identiteFile) : "";
-      const permisBase64 = permisFile ? await getBase64(permisFile) : "";
+    const identiteFile = document.getElementById('carteIdentite').files[0];
+    const permisFile = document.getElementById('permis').files[0];
 
-      const vehicle = {
-        nomVehicule: document.getElementById('nomVehicule').value,
-        plaque: document.getElementById('plaque').value,
-        vendeurNom: document.getElementById('vendeurNom').value,
-        vendeurPrenom: document.getElementById('vendeurPrenom').value,
-        acheteurNom: document.getElementById('acheteurNom').value,
-        acheteurPrenom: document.getElementById('acheteurPrenom').value,
-        identite: identiteBase64,
-        permis: permisBase64
-      };
+    const identiteBase64 = identiteFile ? await getBase64(identiteFile) : "";
+    const permisBase64 = permisFile ? await getBase64(permisFile) : "";
 
-      storedVehicles.push(vehicle);
-      saveVehicles();
-      displayVehicles();
-      form.reset();
+    const vehicle = {
+      nomVehicule: document.getElementById('nomVehicule').value,
+      plaque: document.getElementById('plaque').value,
+      vendeurNom: document.getElementById('vendeurNom').value,
+      vendeurPrenom: document.getElementById('vendeurPrenom').value,
+      acheteurNom: document.getElementById('acheteurNom').value,
+      acheteurPrenom: document.getElementById('acheteurPrenom').value,
+      identite: identiteBase64,
+      permis: permisBase64,
+      prix: prix,                  // Ajouter le prix
+      dateAchat: dateAchat,        // Ajouter la date d'achat
+      heureAchat: heureAchat       // Ajouter l'heure d'achat
+    };
+
+    storedVehicles.push(vehicle);
+    saveVehicles();
+    displayVehicles();
+    form.reset();
     });
+
 
     function filterVehicles() {
       const searchValue = searchInput.value.toLowerCase();
