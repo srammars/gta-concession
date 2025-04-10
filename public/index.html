@@ -88,15 +88,31 @@
     <select id="vendeur">
       <option value="" disabled selected>Choisir un vendeur</option>
     </select>
-    
+    <button type="button" onclick="ajouterVendeur()">Ajouter un nouveau vendeur</button><br>
+
     <select id="acheteur">
       <option value="" disabled selected>Choisir un acheteur</option>
     </select>
+    <button type="button" onclick="ajouterAcheteur()">Ajouter un nouveau acheteur</button><br>
 
     Prix du véhicule : <input type="number" id="prix" placeholder="Prix du véhicule" required><br>
     
     <button type="submit">Ajouter</button>
   </form>    
+
+  <div id="nouveauVendeur" style="display:none;">
+    <h3>Ajouter un vendeur</h3>
+    <input type="text" id="nomVendeur" placeholder="Nom du vendeur" required><br>
+    <input type="text" id="prenomVendeur" placeholder="Prénom du vendeur" required><br>
+    <button type="button" onclick="enregistrerVendeur()">Enregistrer le vendeur</button>
+  </div>
+
+  <div id="nouveauAcheteur" style="display:none;">
+    <h3>Ajouter un acheteur</h3>
+    <input type="text" id="nomAcheteur" placeholder="Nom de l'acheteur" required><br>
+    <input type="text" id="prenomAcheteur" placeholder="Prénom de l'acheteur" required><br>
+    <button type="button" onclick="enregistrerAcheteur()">Enregistrer l'acheteur</button>
+  </div>
 
   <script>
     // Fonction pour récupérer les utilisateurs (vendeurs et acheteurs)
@@ -121,6 +137,78 @@
         });
       } catch (err) {
         console.error('Erreur lors du chargement des utilisateurs:', err);
+      }
+    }
+
+    // Fonction pour ajouter un nouveau vendeur
+    function ajouterVendeur() {
+      document.getElementById('nouveauVendeur').style.display = 'block';
+      document.getElementById('nouveauAcheteur').style.display = 'none';
+    }
+
+    // Fonction pour ajouter un nouveau acheteur
+    function ajouterAcheteur() {
+      document.getElementById('nouveauAcheteur').style.display = 'block';
+      document.getElementById('nouveauVendeur').style.display = 'none';
+    }
+
+    // Fonction pour enregistrer un nouveau vendeur
+    async function enregistrerVendeur() {
+      const nom = document.getElementById('nomVendeur').value;
+      const prenom = document.getElementById('prenomVendeur').value;
+      const role = 'vendeur';
+
+      const userData = { nom, prenom, role };
+
+      try {
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(userData)
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert('Vendeur ajouté avec succès');
+          loadUsers();
+          document.getElementById('nouveauVendeur').style.display = 'none';
+        } else {
+          alert('Erreur lors de l\'ajout du vendeur');
+        }
+      } catch (err) {
+        console.error('Erreur lors de l\'ajout du vendeur:', err);
+      }
+    }
+
+    // Fonction pour enregistrer un nouveau acheteur
+    async function enregistrerAcheteur() {
+      const nom = document.getElementById('nomAcheteur').value;
+      const prenom = document.getElementById('prenomAcheteur').value;
+      const role = 'acheteur';
+
+      const userData = { nom, prenom, role };
+
+      try {
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(userData)
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert('Acheteur ajouté avec succès');
+          loadUsers();
+          document.getElementById('nouveauAcheteur').style.display = 'none';
+        } else {
+          alert('Erreur lors de l\'ajout de l\'acheteur');
+        }
+      } catch (err) {
+        console.error('Erreur lors de l\'ajout de l\'acheteur:', err);
       }
     }
 

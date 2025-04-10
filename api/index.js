@@ -94,6 +94,23 @@ app.post('/api/vehicles', async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de l\'ajout du véhicule' });
   }
 });
+// Route pour ajouter un utilisateur (vendeur ou acheteur)
+app.post('/api/users', async (req, res) => {
+  const { nom, prenom, role } = req.body;
+
+  if (!nom || !prenom || !role) {
+    return res.status(400).json({ error: 'Nom, prénom et rôle sont nécessaires.' });
+  }
+
+  const user = new User({ nom, prenom, role });
+
+  try {
+    const savedUser = await user.save();
+    res.status(201).json(savedUser); // Renvoie l'utilisateur enregistré
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de l\'enregistrement de l\'utilisateur' });
+  }
+});
 
 // Démarrer le serveur backend
 app.listen(port, () => {
