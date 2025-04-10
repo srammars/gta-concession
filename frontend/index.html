@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concession GTA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Gestion de la Concession GTA</h1>
+
+    <h2>Ajouter un véhicule</h2>
+    <form id="addVehicleForm" enctype="multipart/form-data">
+        <input type="text" id="marque" placeholder="Marque" required><br>
+        <input type="text" id="modele" placeholder="Modèle" required><br>
+        <input type="number" id="prix" placeholder="Prix" required><br>
+        <input type="file" id="image" accept="image/*" required><br>
+        <input type="file" id="permis" accept="image/*" required><br>
+        <input type="file" id="identite" accept="image/*" required><br>
+        <input type="text" id="vendeur" placeholder="Vendeur" required><br>
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <h2>Liste des véhicules</h2>
+    <ul id="vehicleList"></ul>
+
+    <script>
+        document.getElementById("addVehicleForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append("marque", document.getElementById("marque").value);
+            formData.append("modele", document.getElementById("modele").value);
+            formData.append("prix", document.getElementById("prix").value);
+            formData.append("vendeur", document.getElementById("vendeur").value);
+            formData.append("image", document.getElementById("image").files[0]);
+            formData.append("permis", document.getElementById("permis").files[0]);
+            formData.append("identite", document.getElementById("identite").files[0]);
+
+            fetch("http://localhost:3000/upload", {
+                method: "POST",
+                body: formData
+            }).then(response => response.json())
+              .then(data => {
+                  console.log(data);
+                  // Afficher les URLs des images dans la liste
+                  const li = document.createElement('li');
+                  li.innerHTML = `
+                      <strong>Véhicule :</strong> ${document.getElementById("marque").value} ${document.getElementById("modele").value} <br>
+                      <img src="${data.imageUrl}" alt="Image du véhicule" width="100"><br>
+                      <img src="${data.permisUrl}" alt="Permis de conduire" width="100"><br>
+                      <img src="${data.identiteUrl}" alt="Pièce d'identité" width="100"><br>
+                  `;
+                  document.getElementById("vehicleList").appendChild(li);
+              })
+              .catch(error => console.error("Erreur :", error));
+        });
+    </script>
+</body>
+</html>

@@ -10,11 +10,5 @@
     "CLOUD_NAME": "deos9dish",
     "API_KEY": "663234247642669",
     "API_SECRET": "IE-QdBtsOUeURS1j_149Am7J_Qs"
-  },
-  "routes": [
-    {
-      "src": "/api/upload",
-      "dest": "/backend/index.js"
-    }
-  ]
+  }
 }
