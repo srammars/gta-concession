@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
+const path = require('path');
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));  // Envoie le fichier index.html à la racine
+});
 
 // Route pour ajouter un utilisateur (vendeur ou acheteur)
 app.post('/api/users', async (req, res) => {
