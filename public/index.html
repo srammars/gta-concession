@@ -2,32 +2,32 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Gestion de véhicules</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Véhicules</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #f7f7f7;
-      margin: 0;
-      padding: 0;
+      padding: 20px;
     }
 
-    h1, h2 {
-      color: #333;
+    h1 {
       text-align: center;
-    }
-
-    .container {
-      width: 80%;
-      margin: 0 auto;
-      padding: 30px;
+      color: #333;
     }
 
     .form-container {
-      background-color: white;
+      background-color: #fff;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
+    }
+
+    .form-container h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: #2e86de;
     }
 
     input[type="text"], input[type="number"], button {
@@ -42,7 +42,6 @@
     button {
       background-color: #2e86de;
       color: white;
-      font-size: 16px;
       cursor: pointer;
       border: none;
     }
@@ -51,11 +50,10 @@
       background-color: #1e6fc8;
     }
 
-    table {
+    #vehicleTable {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background-color: white;
     }
 
     th, td {
@@ -66,200 +64,208 @@
 
     th {
       background-color: #f4f4f4;
+      font-weight: bold;
     }
 
-    input[type="text"]#searchBar {
+    tr:hover {
+      background-color: #ecf0f1;
+    }
+
+    #searchBar {
       width: 100%;
       padding: 12px;
       margin-bottom: 20px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-  <h1>Ajouter un véhicule</h1>
 
-  <form id="vehicleForm">
-    <input type="text" id="nomVehicule" placeholder="Nom du véhicule" required><br>
-    <input type="text" id="plaque" placeholder="Plaque d'immatriculation" required><br>
-    
-    <select id="vendeur">
-      <option value="" disabled selected>Choisir un vendeur</option>
-    </select>
-    <button type="button" onclick="ajouterVendeur()">Ajouter un nouveau vendeur</button><br>
+  <h1>Gestion des Véhicules</h1>
 
-    <select id="acheteur">
-      <option value="" disabled selected>Choisir un acheteur</option>
-    </select>
-    <button type="button" onclick="ajouterAcheteur()">Ajouter un nouveau acheteur</button><br>
-
-    Prix du véhicule : <input type="number" id="prix" placeholder="Prix du véhicule" required><br>
-    
-    <button type="submit">Ajouter</button>
-  </form>    
-
-  <div id="nouveauVendeur" style="display:none;">
-    <h3>Ajouter un vendeur</h3>
-    <input type="text" id="nomVendeur" placeholder="Nom du vendeur" required><br>
-    <input type="text" id="prenomVendeur" placeholder="Prénom du vendeur" required><br>
-    <button type="button" onclick="enregistrerVendeur()">Enregistrer le vendeur</button>
+  <div class="form-container">
+    <h2>Ajouter un Vendeur</h2>
+    <form id="vendeurForm">
+      <input type="text" id="nomVendeur" placeholder="Nom du vendeur" required>
+      <input type="text" id="prenomVendeur" placeholder="Prénom du vendeur" required>
+      <button type="submit">Ajouter Vendeur</button>
+    </form>
   </div>
 
-  <div id="nouveauAcheteur" style="display:none;">
-    <h3>Ajouter un acheteur</h3>
-    <input type="text" id="nomAcheteur" placeholder="Nom de l'acheteur" required><br>
-    <input type="text" id="prenomAcheteur" placeholder="Prénom de l'acheteur" required><br>
-    <button type="button" onclick="enregistrerAcheteur()">Enregistrer l'acheteur</button>
+  <div class="form-container">
+    <h2>Ajouter un Acheteur</h2>
+    <form id="acheteurForm">
+      <input type="text" id="nomAcheteur" placeholder="Nom de l'acheteur" required>
+      <input type="text" id="prenomAcheteur" placeholder="Prénom de l'acheteur" required>
+      <button type="submit">Ajouter Acheteur</button>
+    </form>
   </div>
+
+  <div class="form-container">
+    <h2>Ajouter un Véhicule</h2>
+    <form id="vehicleForm">
+      <input type="text" id="nomVehicule" placeholder="Nom du véhicule" required>
+      <input type="text" id="plaque" placeholder="Plaque d'immatriculation" required>
+      <input type="number" id="prix" placeholder="Prix du véhicule" required>
+      <select id="vendeurSelect" required></select>
+      <select id="acheteurSelect" required></select>
+      <button type="submit">Ajouter Véhicule</button>
+    </form>
+  </div>
+
+  <input type="text" id="searchBar" placeholder="Rechercher...">
+
+  <table id="vehicleTable">
+    <thead>
+      <tr>
+        <th>Nom du véhicule</th>
+        <th>Plaque</th>
+        <th>Vendeur</th>
+        <th>Acheteur</th>
+        <th>Prix</th>
+        <th>Date & Heure d'achat</th>
+      </tr>
+    </thead>
+    <tbody id="vehicleBody"></tbody>
+  </table>
 
   <script>
-    // Fonction pour récupérer les utilisateurs (vendeurs et acheteurs)
+    // Variables
+    const vendeurForm = document.getElementById('vendeurForm');
+    const acheteurForm = document.getElementById('acheteurForm');
+    const vehicleForm = document.getElementById('vehicleForm');
+    const vehicleBody = document.getElementById('vehicleBody');
+    const searchBar = document.getElementById('searchBar');
+    const vendeurSelect = document.getElementById('vendeurSelect');
+    const acheteurSelect = document.getElementById('acheteurSelect');
+
+    // Récupérer les utilisateurs et véhicules depuis l'API
     async function loadUsers() {
       try {
         const response = await fetch('/api/users');
         const users = await response.json();
-        
-        const vendeurSelect = document.getElementById('vendeur');
-        const acheteurSelect = document.getElementById('acheteur');
-        
-        users.forEach(user => {
-          const option = document.createElement('option');
-          option.value = `${user.nom} ${user.prenom}`;
-          option.textContent = `${user.nom} ${user.prenom}`;
-          
-          if (user.role === 'vendeur') {
-            vendeurSelect.appendChild(option);
-          } else if (user.role === 'acheteur') {
-            acheteurSelect.appendChild(option);
-          }
-        });
-      } catch (err) {
-        console.error('Erreur lors du chargement des utilisateurs:', err);
+        updateUserSelects(users);
+      } catch (error) {
+        console.error('Erreur de récupération des utilisateurs:', error);
       }
     }
 
-    // Fonction pour ajouter un nouveau vendeur
-    function ajouterVendeur() {
-      document.getElementById('nouveauVendeur').style.display = 'block';
-      document.getElementById('nouveauAcheteur').style.display = 'none';
+    async function loadVehicles() {
+      try {
+        const response = await fetch('/api/vehicles');
+        const vehicles = await response.json();
+        displayVehicles(vehicles);
+      } catch (error) {
+        console.error('Erreur de récupération des véhicules:', error);
+      }
     }
 
-    // Fonction pour ajouter un nouveau acheteur
-    function ajouterAcheteur() {
-      document.getElementById('nouveauAcheteur').style.display = 'block';
-      document.getElementById('nouveauVendeur').style.display = 'none';
+    function displayVehicles(vehicles) {
+      vehicleBody.innerHTML = '';
+      vehicles.forEach(vehicle => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${vehicle.nomVehicule}</td>
+          <td>${vehicle.plaque}</td>
+          <td>${vehicle.vendeur.nom} ${vehicle.vendeur.prenom}</td>
+          <td>${vehicle.acheteur.nom} ${vehicle.acheteur.prenom}</td>
+          <td>${vehicle.prix} €</td>
+          <td>${new Date(vehicle.dateAchat).toLocaleDateString()} ${vehicle.heureAchat}</td>
+        `;
+        vehicleBody.appendChild(row);
+      });
     }
 
-    // Fonction pour enregistrer un nouveau vendeur
-    async function enregistrerVendeur() {
+    function updateUserSelects(users) {
+      vendeurSelect.innerHTML = '';
+      acheteurSelect.innerHTML = '';
+      users.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user._id;
+        option.textContent = `${user.nom} ${user.prenom}`;
+        if (user.role === 'vendeur') {
+          vendeurSelect.appendChild(option);
+        } else if (user.role === 'acheteur') {
+          acheteurSelect.appendChild(option);
+        }
+      });
+    }
+
+    // Ajouter un vendeur
+    vendeurForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
       const nom = document.getElementById('nomVendeur').value;
       const prenom = document.getElementById('prenomVendeur').value;
-      const role = 'vendeur';
 
-      const userData = { nom, prenom, role };
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom, prenom, role: 'vendeur' })
+      });
 
-      try {
-        const response = await fetch('/api/users', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(userData)
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          alert('Vendeur ajouté avec succès');
-          loadUsers();
-          document.getElementById('nouveauVendeur').style.display = 'none';
-        } else {
-          alert('Erreur lors de l\'ajout du vendeur');
-        }
-      } catch (err) {
-        console.error('Erreur lors de l\'ajout du vendeur:', err);
-      }
-    }
-
-    // Fonction pour enregistrer un nouveau acheteur
-    async function enregistrerAcheteur() {
-      const nom = document.getElementById('nomAcheteur').value;
-      const prenom = document.getElementById('prenomAcheteur').value;
-      const role = 'acheteur';
-
-      const userData = { nom, prenom, role };
-
-      try {
-        const response = await fetch('/api/users', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(userData)
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          alert('Acheteur ajouté avec succès');
-          loadUsers();
-          document.getElementById('nouveauAcheteur').style.display = 'none';
-        } else {
-          alert('Erreur lors de l\'ajout de l\'acheteur');
-        }
-      } catch (err) {
-        console.error('Erreur lors de l\'ajout de l\'acheteur:', err);
-      }
-    }
-
-    // Fonction pour ajouter un véhicule
-    document.getElementById('vehicleForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const nomVehicule = document.getElementById('nomVehicule').value;
-      const plaque = document.getElementById('plaque').value;
-      const vendeur = document.getElementById('vendeur').value;
-      const acheteur = document.getElementById('acheteur').value;
-      const prix = document.getElementById('prix').value;
-
-      const [vendeurNom, vendeurPrenom] = vendeur.split(' ');
-      const [acheteurNom, acheteurPrenom] = acheteur.split(' ');
-
-      const vehicleData = {
-        nomVehicule,
-        plaque,
-        vendeurNom,
-        vendeurPrenom,
-        acheteurNom,
-        acheteurPrenom,
-        prix
-      };
-
-      try {
-        const response = await fetch('/api/vehicles', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(vehicleData)
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          alert('Véhicule ajouté avec succès');
-          // Optionnel: réinitialiser le formulaire
-          document.getElementById('vehicleForm').reset();
-        } else {
-          alert('Erreur lors de l\'ajout du véhicule');
-        }
-      } catch (err) {
-        console.error('Erreur lors de l\'ajout du véhicule:', err);
-        alert('Erreur lors de l\'ajout du véhicule');
-      }
+      const data = await response.json();
+      loadUsers();
+      alert(`Vendeur ajouté: ${data.nom} ${data.prenom}`);
     });
 
-    // Charger les utilisateurs au démarrage
+    // Ajouter un acheteur
+    acheteurForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nom = document.getElementById('nomAcheteur').value;
+      const prenom = document.getElementById('prenomAcheteur').value;
+
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom, prenom, role: 'acheteur' })
+      });
+
+      const data = await response.json();
+      loadUsers();
+      alert(`Acheteur ajouté: ${data.nom} ${data.prenom}`);
+    });
+
+    // Ajouter un véhicule
+    vehicleForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nomVehicule = document.getElementById('nomVehicule').value;
+      const plaque = document.getElementById('plaque').value;
+      const prix = document.getElementById('prix').value;
+      const vendeurId = vendeurSelect.value;
+      const acheteurId = acheteurSelect.value;
+      const dateAchat = new Date().toISOString();
+      const heureAchat = new Date().toLocaleTimeString();
+
+      const response = await fetch('/api/vehicles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nomVehicule, plaque, vendeurId, acheteurId, prix, dateAchat, heureAchat })
+      });
+
+      const data = await response.json();
+      loadVehicles();
+      alert(`Véhicule ajouté: ${data.nomVehicule}`);
+    });
+
+    // Recherche
+    searchBar.addEventListener('input', () => {
+      const searchQuery = searchBar.value.toLowerCase();
+      const rows = vehicleBody.querySelectorAll('tr');
+      rows.forEach(row => {
+        const columns = row.querySelectorAll('td');
+        const nomVehicule = columns[0].textContent.toLowerCase();
+        const plaque = columns[1].textContent.toLowerCase();
+        if (nomVehicule.includes(searchQuery) || plaque.includes(searchQuery)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+
+    // Initialisation
     loadUsers();
+    loadVehicles();
   </script>
 </body>
 </html>

@@ -1,99 +1,29 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 
-dotenv.config();
-
-// Création de l'application Express
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
-// Middleware pour gérer les requêtes JSON et CORS
+// Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors()); // Permet les requêtes CORS depuis le frontend
 
 // Connexion à la base de données MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connecté à la base de données MongoDB'))
-  .catch((err) => console.log('Erreur de connexion à la base de données MongoDB:', err));
+mongoose.connect('mongodb://localhost:27017/gta_concession', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connexion à la base de données MongoDB réussie'))
+  .catch(err => console.error('Erreur de connexion à MongoDB', err));
 
-// Schéma et modèle pour les véhicules
-const vehicleSchema = new mongoose.Schema({
-  nomVehicule: String,
-  plaque: String,
-  vendeurNom: String,
-  vendeurPrenom: String,
-  acheteurNom: String,
-  acheteurPrenom: String,
-  prix: Number,
-  dateAchat: String,
-  heureAchat: String
-});
-
-const Vehicle = mongoose.model('Vehicle', vehicleSchema);
-
-// Schéma et modèle pour les utilisateurs (vendeurs et acheteurs)
+// Schéma pour les utilisateurs (vendeur et acheteur)
 const userSchema = new mongoose.Schema({
   nom: String,
   prenom: String,
-  role: String // "vendeur" ou "acheteur"
+  role: { type: String, enum: ['vendeur', 'acheteur'], required: true },
 });
 
 const User = mongoose.model('User', userSchema);
 
-// Route pour récupérer tous les véhicules
-app.get('/api/vehicles', async (req, res) => {
-  try {
-    const vehicles = await Vehicle.find();
-    res.json(vehicles); // Renvoie les véhicules sous format JSON
-  } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la récupération des véhicules' });
-  }
-});
-
-// Route pour récupérer tous les utilisateurs (vendeurs et acheteurs)
-app.get('/api/users', async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json(users); // Renvoie les utilisateurs sous format JSON
-  } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
-  }
-});
-
-// Route pour ajouter un véhicule
-app.post('/api/vehicles', async (req, res) => {
-  const { nomVehicule, plaque, vendeurNom, vendeurPrenom, acheteurNom, acheteurPrenom, prix } = req.body;
-
-  if (!nomVehicule || !plaque || !vendeurNom || !vendeurPrenom || !acheteurNom || !acheteurPrenom || !prix) {
-    return res.status(400).json({ error: 'Tous les champs sont requis.' });
-  }
-
-  // Date et heure actuelles
-  const dateAchat = new Date().toLocaleDateString();
-  const heureAchat = new Date().toLocaleTimeString();
-
-  const vehicle = new Vehicle({
-    nomVehicule,
-    plaque,
-    vendeurNom,
-    vendeurPrenom,
-    acheteurNom,
-    acheteurPrenom,
-    prix,
-    dateAchat,
-    heureAchat
-  });
-
-  try {
-    const savedVehicle = await vehicle.save();
-    res.status(201).json(savedVehicle); // Renvoie le véhicule ajouté
-  } catch (err) {
-    res.status(500).json({ error: 'Erreur lors de l\'ajout du véhicule' });
-  }
-});
 // Route pour ajouter un utilisateur (vendeur ou acheteur)
 app.post('/api/users', async (req, res) => {
   const { nom, prenom, role } = req.body;
@@ -108,11 +38,54 @@ app.post('/api/users', async (req, res) => {
     const savedUser = await user.save();
     res.status(201).json(savedUser); // Renvoie l'utilisateur enregistré
   } catch (err) {
+    console.error("Erreur lors de l'ajout de l'utilisateur :", err);
     res.status(500).json({ error: 'Erreur lors de l\'enregistrement de l\'utilisateur' });
   }
 });
 
-// Démarrer le serveur backend
+// Schéma pour les véhicules
+const vehicleSchema = new mongoose.Schema({
+  nomVehicule: String,
+  plaque: String,
+  vendeur: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  acheteur: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  prix: Number,
+  dateAchat: Date,
+  heureAchat: String,
+});
+
+const Vehicle = mongoose.model('Vehicle', vehicleSchema);
+
+// Route pour ajouter un véhicule
+app.post('/api/vehicles', async (req, res) => {
+  const { nomVehicule, plaque, vendeurId, acheteurId, prix, dateAchat, heureAchat } = req.body;
+
+  if (!nomVehicule || !plaque || !vendeurId || !acheteurId || !prix) {
+    return res.status(400).json({ error: 'Toutes les informations sont nécessaires.' });
+  }
+
+  try {
+    const vehicle = new Vehicle({ nomVehicule, plaque, vendeur: vendeurId, acheteur: acheteurId, prix, dateAchat, heureAchat });
+    await vehicle.save();
+    res.status(201).json(vehicle); // Retourne le véhicule ajouté
+  } catch (err) {
+    console.error("Erreur lors de l'ajout du véhicule :", err);
+    res.status(500).json({ error: 'Erreur lors de l\'enregistrement du véhicule' });
+  }
+});
+
+// Route pour récupérer tous les véhicules
+app.get('/api/vehicles', async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find().populate('vendeur acheteur');
+    res.status(200).json(vehicles);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des véhicules :", err);
+    res.status(500).json({ error: 'Erreur lors de la récupération des véhicules' });
+  }
+});
+
+// Démarrer le serveur
 app.listen(port, () => {
   console.log(`Serveur backend démarré sur http://localhost:${port}`);
 });
