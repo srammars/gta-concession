@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Gestion de véhicules</title>
   <style>
-    /* Styles (inchangés) */
     body {
       font-family: 'Arial', sans-serif;
       background-color: #f7f7f7;
@@ -17,7 +16,6 @@
       text-align: center;
     }
 
-    /* Container principal */
     .container {
       width: 80%;
       margin: 0 auto;
@@ -53,7 +51,6 @@
       background-color: #1e6fc8;
     }
 
-    /* Table des véhicules */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -123,19 +120,18 @@
     const searchInput = document.getElementById('searchBar');
     let storedVehicles = [];
 
-    // Récupère les véhicules depuis le localStorage (si existant)
+    // Récupère les véhicules depuis le serveur
     function loadVehicles() {
-      const storedData = localStorage.getItem('vehicles');
-      if (storedData) {
-        storedVehicles = JSON.parse(storedData);
-        displayVehicles();
-      }
+      fetch('/api/vehicles')
+        .then(response => response.json())
+        .then(data => {
+          storedVehicles = data;
+          displayVehicles();
+        })
+        .catch(err => console.error('Erreur de récupération des véhicules:', err));
     }
 
-    function saveVehicles() {
-      localStorage.setItem('vehicles', JSON.stringify(storedVehicles));
-    }
-
+    // Affiche les véhicules dans la table
     function displayVehicles(vehicles = storedVehicles) {
       vehicleBody.innerHTML = "";
       vehicles.forEach(vehicle => {
@@ -152,6 +148,7 @@
       });
     }
 
+    // Filtre les véhicules selon la recherche
     function filterVehicles() {
       const searchValue = searchInput.value.toLowerCase();
       const filtered = storedVehicles.filter(vehicle =>
@@ -163,12 +160,13 @@
       displayVehicles(filtered);
     }
 
+    // Ajoute un nouveau véhicule
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
       const prix = document.getElementById('prix').value;
-      const dateAchat = new Date().toLocaleDateString();  // Date actuelle
-      const heureAchat = new Date().toLocaleTimeString(); // Heure actuelle
+      const dateAchat = new Date().toLocaleDateString();
+      const heureAchat = new Date().toLocaleTimeString();
 
       const vehicle = {
         nomVehicule: document.getElementById('nomVehicule').value,
@@ -182,13 +180,23 @@
         heureAchat: heureAchat
       };
 
-      storedVehicles.push(vehicle);
-      saveVehicles();
-      displayVehicles();
-      form.reset();
+      // Envoie les données au serveur
+      fetch('/api/vehicles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(vehicle)
+      })
+      .then(response => response.json())
+      .then(() => {
+        loadVehicles();  // Recharge les véhicules après l'ajout
+        form.reset();
+      })
+      .catch(err => console.error('Erreur lors de l\'ajout du véhicule:', err));
     });
 
-    // Affichage initial
+    // Charger les véhicules au démarrage
     loadVehicles();
   </script>
 
