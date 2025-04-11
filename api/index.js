@@ -1,9 +1,10 @@
+const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-module.exports = (req, res) => {
+const server = http.createServer((req, res) => {
     const filePath = path.join(__dirname, '../data/transactions.json');
-    
+
     if (req.method === 'POST' && req.url === '/ajouter_transaction') {
         let body = '';
         req.on('data', chunk => { body += chunk; });
@@ -44,4 +45,10 @@ module.exports = (req, res) => {
     } else {
         res.status(404).json({ error: 'Not found' });
     }
-};
+});
+
+// Ensure the server listens on the correct port (provided by Render or 10000 as fallback)
+const port = process.env.PORT || 10000;
+server.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+});
