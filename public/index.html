@@ -3,197 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter une Transaction</title>
+    <title>Gestion des Transactions</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<style>
-    /* Style global */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
+<style>* {
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+    box-sizing: border-box;
 }
 
-/* Titre principal */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    padding: 20px;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+}
+
 h1 {
-    color: #333;
-    font-size: 2.5rem;
+    text-align: center;
     margin-bottom: 20px;
 }
 
-/* Formulaire de transaction */
 form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 500px;
-    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 form input {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
+    padding: 8px;
+    font-size: 14px;
+    width: 200px;
     border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-}
-
-form input:focus {
-    border-color: #007bff;
-    outline: none;
+    border-radius: 4px;
 }
 
 form button {
-    width: 100%;
-    padding: 14px;
-    background-color: #007bff;
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 1.1rem;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
 }
 
 form button:hover {
-    background-color: #0056b3;
+    background-color: #45a049;
 }
 
-form button:active {
-    background-color: #004085;
-}
-
-/* Recherche de transactions */
 #searchInput {
     width: 100%;
-    padding: 12px;
-    margin-top: 20px;
+    padding: 8px;
     margin-bottom: 20px;
+    font-size: 14px;
     border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
+    border-radius: 4px;
 }
 
-#searchInput:focus {
-    border-color: #007bff;
-    outline: none;
-}
-
-/* Affichage des transactions */
-#transactionsContainer {
+table {
     width: 100%;
-    max-width: 800px;
+    border-collapse: collapse;
     margin-top: 20px;
+}
+
+table th, table td {
     padding: 10px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    border: 1px solid #ddd;
 }
 
-#transactionsContainer div {
+table th {
+    background-color: #f4f4f4;
+}
+
+table tr:nth-child(even) {
     background-color: #f9f9f9;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    transition: transform 0.2s ease;
 }
-
-#transactionsContainer div:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsivité */
-@media (max-width: 600px) {
-    body {
-        padding: 20px;
-    }
-
-    form {
-        width: 100%;
-        padding: 15px;
-    }
-
-    #transactionsContainer {
-        width: 100%;
-        padding: 5px;
-    }
-}
-
 </style>
 <body>
-    <h1>Ajouter une Transaction</h1>
-    <form id="transactionForm">
-        <input type="text" id="nom_vendeur" name="nom_vendeur" placeholder="Nom du vendeur" required>
-        <input type="text" id="prenom_vendeur" name="prenom_vendeur" placeholder="Prénom du vendeur" required>
-        <input type="text" id="nom_acheteur" name="nom_acheteur" placeholder="Nom de l'acheteur" required>
-        <input type="text" id="prenom_acheteur" name="prenom_acheteur" placeholder="Prénom de l'acheteur" required>
-        <input type="number" id="prix" name="prix" placeholder="Prix du véhicule" required>
-        <input type="text" id="nom_vehicule" name="nom_vehicule" placeholder="Nom du véhicule" required>
-        <input type="text" id="type_vehicule" name="type_vehicule" placeholder="Type du véhicule" required>
-        <input type="text" id="plaque" name="plaque" placeholder="Plaque d'immatriculation" required>
-        <button type="submit">Ajouter</button>
-    </form>
+    <div class="container">
+        <h1>Gestion des Transactions</h1>
 
-    <h2>Transactions enregistrées</h2>
-    <input type="text" id="searchInput" placeholder="Rechercher...">
-    <div id="transactionsContainer"></div>
+        <!-- Formulaire d'ajout de transaction -->
+        <form id="transactionForm">
+            <input type="text" name="nom_vendeur" placeholder="Nom du vendeur" required>
+            <input type="text" name="prenom_vendeur" placeholder="Prénom du vendeur" required>
+            <input type="text" name="nom_acheteur" placeholder="Nom de l'acheteur" required>
+            <input type="text" name="prenom_acheteur" placeholder="Prénom de l'acheteur" required>
+            <input type="number" name="prix" placeholder="Prix" required>
+            <input type="text" name="nom_vehicule" placeholder="Nom du véhicule" required>
+            <input type="text" name="type_vehicule" placeholder="Type du véhicule" required>
+            <input type="text" name="plaque" placeholder="Plaque d'immatriculation" required>
+            <button type="submit">Ajouter Transaction</button>
+        </form>
 
-    <script>
-        document.getElementById('transactionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            try {
-                const response = await fetch('/ajouter_transaction', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
+        <!-- Recherche -->
+        <input type="text" id="searchInput" placeholder="Rechercher..." onkeyup="filterTransactions()">
 
-                const result = await response.json();
-                if (response.ok) {
-                    alert('Transaction ajoutée avec succès');
-                    loadTransactions();
-                    e.target.reset();
-                } else {
-                    alert(result.error || "Erreur lors de l'ajout de la transaction");
-                }
-            } catch (error) {
-                console.error('Erreur réseau ou serveur :', error);
-            }
-        });
+        <!-- Tableau des transactions -->
+        <table id="transactionsTable">
+            <thead>
+                <tr>
+                    <th>Nom Vendeur</th>
+                    <th>Prénom Vendeur</th>
+                    <th>Nom Acheteur</th>
+                    <th>Prénom Acheteur</th>
+                    <th>Prix (€)</th>
+                    <th>Nom Véhicule</th>
+                    <th>Type Véhicule</th>
+                    <th>Plaque Immatriculation</th>
+                    <th>Date & Heure</th>
+                </tr>
+            </thead>
+            <tbody id="transactionsContainer"></tbody>
+        </table>
+    </div>
 
-        async function loadTransactions() {
-            const query = document.getElementById('searchInput').value;
-            try {
-                const res = await fetch('/transactions?search=' + encodeURIComponent(query));
-                const transactions = await res.json();
-                const container = document.getElementById('transactionsContainer');
-                container.innerHTML = '';
-                transactions.forEach(t => {
-                    const div = document.createElement('div');
-                    div.textContent = `${t.nom_vendeur} ${t.prenom_vendeur} a vendu ${t.nom_vehicule} à ${t.nom_acheteur} ${t.prenom_acheteur} pour ${t.prix}€ - Plaque : ${t.plaque_immatriculation} (${t.date_heure})`;
-                    container.appendChild(div);
-                });
-            } catch (err) {
-                console.error('Erreur chargement transactions :', err);
-            }
-        }
-
-        document.getElementById('searchInput').addEventListener('input', loadTransactions);
-        loadTransactions();
-    </script>
+    <script src="index.js"></script>
 </body>
 </html>
