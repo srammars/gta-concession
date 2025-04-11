@@ -3,129 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Transactions</title>
+    <title>Transactions</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<style>* {
+<style>
+    /* Réinitialiser les styles par défaut */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Corps de la page */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
     padding: 20px;
 }
 
+/* Conteneur principal */
 .container {
-    width: 80%;
-    margin: auto;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+/* En-tête */
+h1, h2 {
     text-align: center;
-    margin-bottom: 20px;
+    color: #333;
 }
 
+/* Formulaire d'ajout de transaction */
 form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+form label {
+    font-weight: bold;
+    color: #555;
 }
 
 form input {
-    padding: 8px;
-    font-size: 14px;
-    width: 200px;
+    padding: 10px;
+    font-size: 16px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    outline: none;
+}
+
+form input:focus {
+    border-color: #007bff;
 }
 
 form button {
-    padding: 10px 20px;
-    font-size: 14px;
-    background-color: #4CAF50;
+    grid-column: span 2;
+    padding: 10px;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 16px;
 }
 
 form button:hover {
-    background-color: #45a049;
+    background-color: #0056b3;
 }
 
-#searchInput {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-table {
+/* Table des transactions */
+#transactionsTable {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
 }
 
-table th, table td {
-    padding: 10px;
-    text-align: left;
+#transactionsTable th, #transactionsTable td {
+    padding: 12px 15px;
     border: 1px solid #ddd;
+    text-align: left;
 }
 
-table th {
-    background-color: #f4f4f4;
+#transactionsTable th {
+    background-color: #f1f1f1;
+    color: #333;
 }
 
-table tr:nth-child(even) {
+#transactionsTable tr:nth-child(even) {
     background-color: #f9f9f9;
 }
+
+#transactionsTable tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Recherche */
+#searchInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#searchInput:focus {
+    border-color: #007bff;
+}
+
+/* Messages d'alerte */
+.alert {
+    padding: 15px;
+    background-color: #f44336;
+    color: white;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.alert.success {
+    background-color: #4CAF50;
+}
+
+.alert.info {
+    background-color: #2196F3;
+}
+
+/* En-tête de la page */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* Ajout d'une animation douce */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+body {
+    animation: fadeIn 1s ease-out;
+}
+
 </style>
 <body>
-    <div class="container">
-        <h1>Gestion des Transactions</h1>
+    <h1>Ajouter une Transaction</h1>
+    
+    <!-- Formulaire pour ajouter une transaction -->
+    <form id="transactionForm">
+        <label for="nom_vendeur">Nom du Vendeur</label>
+        <input type="text" id="nom_vendeur" required>
 
-        <!-- Formulaire d'ajout de transaction -->
-        <form id="transactionForm">
-            <input type="text" name="nom_vendeur" placeholder="Nom du vendeur" required>
-            <input type="text" name="prenom_vendeur" placeholder="Prénom du vendeur" required>
-            <input type="text" name="nom_acheteur" placeholder="Nom de l'acheteur" required>
-            <input type="text" name="prenom_acheteur" placeholder="Prénom de l'acheteur" required>
-            <input type="number" name="prix" placeholder="Prix" required>
-            <input type="text" name="nom_vehicule" placeholder="Nom du véhicule" required>
-            <input type="text" name="type_vehicule" placeholder="Type du véhicule" required>
-            <input type="text" name="plaque" placeholder="Plaque d'immatriculation" required>
-            <button type="submit">Ajouter Transaction</button>
-        </form>
+        <label for="prenom_vendeur">Prénom du Vendeur</label>
+        <input type="text" id="prenom_vendeur" required>
 
-        <!-- Recherche -->
-        <input type="text" id="searchInput" placeholder="Rechercher..." onkeyup="filterTransactions()">
+        <label for="nom_acheteur">Nom de l'Acheteur</label>
+        <input type="text" id="nom_acheteur" required>
 
-        <!-- Tableau des transactions -->
-        <table id="transactionsTable">
-            <thead>
-                <tr>
-                    <th>Nom Vendeur</th>
-                    <th>Prénom Vendeur</th>
-                    <th>Nom Acheteur</th>
-                    <th>Prénom Acheteur</th>
-                    <th>Prix (€)</th>
-                    <th>Nom Véhicule</th>
-                    <th>Type Véhicule</th>
-                    <th>Plaque Immatriculation</th>
-                    <th>Date & Heure</th>
-                </tr>
-            </thead>
-            <tbody id="transactionsContainer"></tbody>
-        </table>
-    </div>
+        <label for="prenom_acheteur">Prénom de l'Acheteur</label>
+        <input type="text" id="prenom_acheteur" required>
 
-    <script src="index.js"></script>
+        <label for="prix">Prix</label>
+        <input type="number" id="prix" required>
+
+        <label for="nom_vehicule">Nom du Véhicule</label>
+        <input type="text" id="nom_vehicule" required>
+
+        <label for="type_vehicule">Type de Véhicule</label>
+        <input type="text" id="type_vehicule" required>
+
+        <label for="plaque">Plaque Immatriculation</label>
+        <input type="text" id="plaque" required>
+
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <h2>Liste des Transactions</h2>
+    <input type="text" id="searchInput" placeholder="Rechercher une transaction..." />
+
+    <table id="transactionsTable">
+        <thead>
+            <tr>
+                <th>Vendeur</th>
+                <th>Acheteur</th>
+                <th>Prix</th>
+                <th>Véhicule</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>// Sélectionner les éléments HTML
+        const form = document.getElementById('transactionForm');
+        const searchInput = document.getElementById('searchInput');
+        const transactionsTableBody = document.querySelector('#transactionsTable tbody');
+        
+        // Fonction pour envoyer une nouvelle transaction au serveur
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+        
+            const newTransaction = {
+                nom_vendeur: document.getElementById('nom_vendeur').value,
+                prenom_vendeur: document.getElementById('prenom_vendeur').value,
+                nom_acheteur: document.getElementById('nom_acheteur').value,
+                prenom_acheteur: document.getElementById('prenom_acheteur').value,
+                prix: document.getElementById('prix').value,
+                nom_vehicule: document.getElementById('nom_vehicule').value,
+                type_vehicule: document.getElementById('type_vehicule').value,
+                plaque: document.getElementById('plaque').value,
+            };
+        
+            fetch('/ajouter_transaction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newTransaction),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Réinitialiser le formulaire et afficher un message
+                    form.reset();
+                    alert(data.message);
+                    loadTransactions(); // Recharge la liste des transactions
+                }
+            })
+            .catch(error => console.error('Erreur:', error));
+        });
+        
+        // Fonction pour charger les transactions depuis le serveur
+        function loadTransactions() {
+            const searchQuery = searchInput.value;
+        
+            fetch(`/transactions?search=${searchQuery}`)
+                .then(response => response.json())
+                .then(transactions => {
+                    transactionsTableBody.innerHTML = ''; // Réinitialiser la table
+        
+                    transactions.forEach(transaction => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${transaction.nom_vendeur} ${transaction.prenom_vendeur}</td>
+                            <td>${transaction.nom_acheteur} ${transaction.prenom_acheteur}</td>
+                            <td>${transaction.prix}</td>
+                            <td>${transaction.nom_vehicule}</td>
+                            <td>${transaction.date_heure}</td>
+                        `;
+                        transactionsTableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Erreur:', error));
+        }
+        
+        // Filtrage en temps réel des transactions
+        searchInput.addEventListener('input', loadTransactions);
+        
+        // Charger les transactions initiales
+        loadTransactions();
+        </script>
 </body>
 </html>

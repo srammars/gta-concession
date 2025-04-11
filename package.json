@@ -1,10 +1,11 @@
 {
   "name": "gta-concession",
   "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "main": "api/index.js",
   "scripts": {
-  "start": "node api/index.js"
-}
-
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
