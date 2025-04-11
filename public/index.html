@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajouter une Transaction</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <h1>Ajouter une Transaction</h1>
@@ -20,43 +20,60 @@
         <button type="submit">Ajouter</button>
     </form>
 
-    <h2>Transactions enregistées</h2>
+    <h2>Transactions enregistrées</h2>
     <div id="transactionsContainer"></div>
 
     <script>
         document.getElementById('transactionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
+            const data = Object.fromEntries(formData.entries());
+
             try {
-                const response = await fetch('/ajouter_transaction', {
+                const response = await fetch('/api/ajouter_transaction', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data),
                 });
 
-                const result = await response.json();
                 if (response.ok) {
-                    alert('Transaction ajoutée avec succès');
+                    const result = await response.json();
+                    alert(result.message || 'Transaction ajoutée avec succès');
+                    e.target.reset();
                     loadTransactions();
                 } else {
-                    alert('Erreur lors de l\'ajout de la transaction');
+                    const errorData = await response.json();
+                    alert(errorData.error || 'Erreur lors de l\'ajout de la transaction');
                 }
             } catch (error) {
-                console.error('Erreur:', error);
+                console.error('Erreur réseau ou serveur :', error);
+                alert('Une erreur est survenue lors de l\'envoi de la transaction');
             }
         });
 
         async function loadTransactions() {
-            const response = await fetch('/transactions');
-            const transactions = await response.json();
-            const container = document.getElementById('transactionsContainer');
-            container.innerHTML = '';
-            transactions.forEach(transaction => {
-                const div = document.createElement('div');
-                div.textContent = `${transaction.nom_vendeur} ${transaction.prenom_vendeur} a vendu ${transaction.nom_vehicule} à ${transaction.nom_acheteur} ${transaction.prenom_acheteur} pour ${transaction.prix}€ - Plaque: ${transaction.plaque_immatriculation}`;
-                container.appendChild(div);
-            });
+            try {
+                const response = await fetch('/api/transactions');
+                const contentType = response.headers.get('content-type');
+
+                if (response.ok && contentType && contentType.includes('application/json')) {
+                    const transactions = await response.json();
+                    const container = document.getElementById('transactionsContainer');
+                    container.innerHTML = '';
+                    transactions.forEach(transaction => {
+                        const div = document.createElement('div');
+                        div.textContent = `${transaction.nom_vendeur} ${transaction.prenom_vendeur} a vendu ${transaction.nom_vehicule} à ${transaction.nom_acheteur} ${transaction.prenom_acheteur} pour ${transaction.prix}€ - Plaque: ${transaction.plaque_immatriculation}`;
+                        container.appendChild(div);
+                    });
+                } else {
+                    const message = await response.text();
+                    console.warn('Réponse non JSON :', message);
+                    document.getElementById('transactionsContainer').innerHTML = 'Aucune transaction trouvée.';
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des transactions :', error);
+                document.getElementById('transactionsContainer').innerHTML = 'Erreur de chargement.';
+            }
         }
 
         // Charger les transactions au démarrage
