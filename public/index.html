@@ -4,8 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajouter une Transaction</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
+<style>
+    /* Style global */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Titre principal */
+h1 {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+/* Formulaire de transaction */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 30px;
+}
+
+form input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+form input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+form button {
+    width: 100%;
+    padding: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+form button:active {
+    background-color: #004085;
+}
+
+/* Recherche de transactions */
+#searchInput {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+#searchInput:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Affichage des transactions */
+#transactionsContainer {
+    width: 100%;
+    max-width: 800px;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#transactionsContainer div {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    transition: transform 0.2s ease;
+}
+
+#transactionsContainer div:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsivité */
+@media (max-width: 600px) {
+    body {
+        padding: 20px;
+    }
+
+    form {
+        width: 100%;
+        padding: 15px;
+    }
+
+    #transactionsContainer {
+        width: 100%;
+        padding: 5px;
+    }
+}
+
+</style>
 <body>
     <h1>Ajouter une Transaction</h1>
     <form id="transactionForm">
@@ -21,62 +147,52 @@
     </form>
 
     <h2>Transactions enregistrées</h2>
+    <input type="text" id="searchInput" placeholder="Rechercher...">
     <div id="transactionsContainer"></div>
 
     <script>
         document.getElementById('transactionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-
+            const data = Object.fromEntries(formData);
             try {
-                const response = await fetch('/api/ajouter_transaction', {
+                const response = await fetch('/ajouter_transaction', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data),
                 });
 
+                const result = await response.json();
                 if (response.ok) {
-                    const result = await response.json();
-                    alert(result.message || 'Transaction ajoutée avec succès');
-                    e.target.reset();
+                    alert('Transaction ajoutée avec succès');
                     loadTransactions();
+                    e.target.reset();
                 } else {
-                    const errorData = await response.json();
-                    alert(errorData.error || 'Erreur lors de l\'ajout de la transaction');
+                    alert(result.error || "Erreur lors de l'ajout de la transaction");
                 }
             } catch (error) {
                 console.error('Erreur réseau ou serveur :', error);
-                alert('Une erreur est survenue lors de l\'envoi de la transaction');
             }
         });
 
         async function loadTransactions() {
+            const query = document.getElementById('searchInput').value;
             try {
-                const response = await fetch('/api/transactions');
-                const contentType = response.headers.get('content-type');
-
-                if (response.ok && contentType && contentType.includes('application/json')) {
-                    const transactions = await response.json();
-                    const container = document.getElementById('transactionsContainer');
-                    container.innerHTML = '';
-                    transactions.forEach(transaction => {
-                        const div = document.createElement('div');
-                        div.textContent = `${transaction.nom_vendeur} ${transaction.prenom_vendeur} a vendu ${transaction.nom_vehicule} à ${transaction.nom_acheteur} ${transaction.prenom_acheteur} pour ${transaction.prix}€ - Plaque: ${transaction.plaque_immatriculation}`;
-                        container.appendChild(div);
-                    });
-                } else {
-                    const message = await response.text();
-                    console.warn('Réponse non JSON :', message);
-                    document.getElementById('transactionsContainer').innerHTML = 'Aucune transaction trouvée.';
-                }
-            } catch (error) {
-                console.error('Erreur lors du chargement des transactions :', error);
-                document.getElementById('transactionsContainer').innerHTML = 'Erreur de chargement.';
+                const res = await fetch('/transactions?search=' + encodeURIComponent(query));
+                const transactions = await res.json();
+                const container = document.getElementById('transactionsContainer');
+                container.innerHTML = '';
+                transactions.forEach(t => {
+                    const div = document.createElement('div');
+                    div.textContent = `${t.nom_vendeur} ${t.prenom_vendeur} a vendu ${t.nom_vehicule} à ${t.nom_acheteur} ${t.prenom_acheteur} pour ${t.prix}€ - Plaque : ${t.plaque_immatriculation} (${t.date_heure})`;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Erreur chargement transactions :', err);
             }
         }
 
-        // Charger les transactions au démarrage
+        document.getElementById('searchInput').addEventListener('input', loadTransactions);
         loadTransactions();
     </script>
 </body>
